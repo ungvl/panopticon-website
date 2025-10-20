@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Work in progress</title>
+    <style>
+      /* Minimal reset */
+      html, body { height: 100%; margin: 0; }
+
+      /* Page background (user-provided image) */
+      body {
+        background-image: url('https://www.adeptclippingpath.com/wp-content/uploads/2022/12/A-Cat-with-Rainbow-Background.jpg');
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+        font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
+      }
+
+      /* Centered small box */
+      .wip-box {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(255,255,255,0.92);
+        color: #111;
+        padding: 10px 18px;
+        border-radius: 8px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+        font-size: 18px;
+        white-space: nowrap;
+      }
+
+      @media (max-width: 420px) {
+        .wip-box { font-size: 16px; padding: 8px 12px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wip-box" role="status" aria-live="polite">Work in progress</div>
+  </body>
+</html>
