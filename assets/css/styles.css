@@ -31,15 +31,15 @@
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
+  width: 100%;
 }
 
 .logout-link {
-  margin-top: 1rem;
+  margin-top: clamp(1rem, 3vh, 2rem);
 }
 
 .logout-link a {
-  color: var(--text-color);
-  text-decoration: none;
+  color: var(--text-color) !important;
   font-size: 0.75rem;
   opacity: 0.5;
   text-transform: uppercase;
@@ -49,16 +49,16 @@
 
 .logout-link a:hover {
   opacity: 1;
-  color: var(--accent-color);
+  color: var(--accent-color) !important;
 }
 
-/* Firefox / Universal Anchor Fixes */
+/* Global Anchor Resets (Firefox Fix) */
 a,
 a:hover,
 a:active,
 a:visited {
-  color: inherit;
-  text-decoration: none;
+  color: var(--text-color) !important;
+  text-decoration: none !important;
 }
 
 body,
@@ -77,30 +77,37 @@ html {
 .container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
+  /* Push footer down */
   align-items: center;
   min-height: 100vh;
   width: 100%;
   text-align: center;
-  padding: clamp(1rem, 5vw, 4rem);
+  padding: clamp(2rem, 8vw, 6rem) 1.5rem;
 }
 
 .main-content {
+  flex: 1;
+  /* Take up available space */
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
   width: 100%;
   max-width: 800px;
 }
 
 .logo-img {
-  width: clamp(80px, 15vw, 120px);
+  width: 100px !important;
+  /* Force explicit width */
+  max-width: 100px;
   height: auto;
   margin-bottom: 2rem;
+  display: block;
 }
 
 h1 {
-  font-size: 4rem;
+  font-size: clamp(2.5rem, 12vw, 5rem);
   font-weight: 800;
   margin: 0;
   letter-spacing: -2px;
@@ -122,8 +129,8 @@ h1 span {
   letter-spacing: 1px;
   opacity: 0.8;
   transition: all 0.3s ease;
-  text-decoration: none;
-  color: var(--text-color);
+  text-decoration: none !important;
+  color: var(--text-color) !important;
 }
 
 .status-badge:hover {
