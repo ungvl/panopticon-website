@@ -1,15 +1,19 @@
 :root {
   --bg-color: #000000;
   --text-color: #ffffff;
-  --accent-color: #f7d000; /* Vibrant Yellow */
+  --accent-color: #f7d000;
+  /* Vibrant Yellow */
   --font-main: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-body, html {
+body,
+html {
   margin: 0;
   padding: 0;
   height: 100%;
@@ -17,7 +21,8 @@ body, html {
   background-color: var(--bg-color);
   color: var(--text-color);
   font-family: var(--font-main);
-  overflow: hidden; /* Prevent scrolling on a pure landing page */
+  overflow: hidden;
+  /* Prevent scrolling on a pure landing page */
 }
 
 .container {
@@ -58,6 +63,8 @@ h1 span {
   letter-spacing: 1px;
   opacity: 0.8;
   transition: all 0.3s ease;
+  text-decoration: none;
+  color: var(--text-color);
 }
 
 .status-badge:hover {
