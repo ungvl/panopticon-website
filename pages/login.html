@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Panopticon | Login</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <style>
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 3rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-box label {
+            display: block;
+            text-align: left;
+            margin-bottom: 0.5rem;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.6;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1.5rem;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: white;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .login-box input:focus {
+            border-color: var(--accent-color);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 6px;
+            font-weight: 800;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        .login-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .logo-img {
+            width: 80px;
+            height: auto;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <img src="../assets/images/Picture1.svg" alt="Panopticon Logo" class="logo-img">
+            <form id="login-form">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="vladu" required>
+                <label for="password">Password</label>
+                <input type="password" id="password" required>
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+        </div>
+    </div>
+    <script src="../assets/js/login.js"></script>
+</body>
+
+</html>

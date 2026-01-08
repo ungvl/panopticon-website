@@ -12,6 +12,34 @@
   box-sizing: border-box;
 }
 
+.hidden {
+  display: none !important;
+}
+
+.tagline {
+  font-size: 1.2rem;
+  opacity: 0.7;
+  margin-bottom: 2rem;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+.logout-link {
+  margin-top: 2rem;
+  font-size: 0.8rem;
+  opacity: 0.5;
+}
+
+.logout-link a {
+  color: var(--text-color);
+  text-decoration: underline;
+}
+
+.logout-link a:hover {
+  opacity: 1;
+  color: var(--accent-color);
+}
+
 body,
 html {
   margin: 0;

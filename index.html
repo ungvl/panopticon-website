@@ -17,8 +17,21 @@
 <body>
   <div class="container">
     <div class="main-content">
+      <img src="assets/images/Picture1.svg" alt="Panopticon Logo"
+        style="width: 100px; height: auto; margin-bottom: 1.5rem;">
       <h1>PANOPTICON<span>.</span></h1>
-      <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" class="status-badge">Work in Progress</a>
+
+      <!-- Unauthenticated View -->
+      <div id="unauth-content" class="hidden">
+        <p class="tagline">The future of local monitoring.</p>
+        <a href="pages/login.html" class="status-badge">Login to Console</a>
+      </div>
+
+      <!-- Authenticated View -->
+      <div id="auth-content" class="hidden">
+        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" class="status-badge">Work in Progress</a>
+        <div class="logout-link"><a href="#" id="logout-btn">Sign Out</a></div>
+      </div>
     </div>
 
     <footer>
