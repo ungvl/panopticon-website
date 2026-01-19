@@ -1,23 +1,39 @@
-// Login functionality
-const setCookie = (name, value, days) => {
-    let expires = "";
-    if (days) {
-        const date = new Date();
-        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        expires = "; expires=" + date.toUTCString();
-    }
-    document.cookie = name + "=" + (value || "") + expires + "; path=/";
-};
+const { Client, Account } = Appwrite;
 
-document.getElementById('login-form').addEventListener('submit', function (e) {
-    e.preventDefault();
+const client = new Client()
+    .setEndpoint('https://cloud.appwrite.io/v1')
+    .setProject('68f0d9e300322bff44ec');
 
-    // Minimal logic: any input allows login for now
-    const username = document.getElementById('username').value;
+const account = new Account(client);
 
-    if (username) {
-        setCookie('panopticon_session', 'true', 1);
-        console.log('Login successful');
-        window.location.href = '../index.html';
-    }
-});
+const loginForm = document.getElementById('login-form');
+
+if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById('username')?.value; // Using username field as email for Appwrite
+        const password = document.getElementById('password')?.value;
+
+        if (!email || !password) return;
+
+        const submitBtn = loginForm.querySelector('.login-btn');
+        const originalBtnText = submitBtn.innerText;
+        submitBtn.innerText = 'AUTHENTICATING...';
+        submitBtn.disabled = true;
+
+        try {
+            // Create session using email and password
+            await account.createEmailPasswordSession(email, password);
+            console.log("Logged in!");
+
+            // Redirect to dashboard (index.html)
+            window.location.href = '../index.html';
+        } catch (error) {
+            console.error("Login failed", error);
+            alert("Login failed: " + (error.message || "Invalid credentials"));
+            submitBtn.innerText = originalBtnText;
+            submitBtn.disabled = false;
+        }
+    });
+}

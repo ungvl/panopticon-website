@@ -12,6 +12,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="../assets/css/styles.css">
+
+    <!-- Appwrite SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@16.1.0"></script>
     <style>
         .login-container {
             display: flex;
@@ -95,8 +98,8 @@
         <div class="login-box">
             <img src="../assets/images/Picture1.svg" alt="Panopticon Logo" class="logo-img">
             <form id="login-form">
-                <label for="username">Username</label>
-                <input type="text" id="username" placeholder="vladu" required>
+                <label for="username">Email</label>
+                <input type="email" id="username" placeholder="vladu@example.com" required>
                 <label for="password">Password</label>
                 <input type="password" id="password" required>
                 <button type="submit" class="login-btn">Login</button>
