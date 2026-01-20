@@ -104,15 +104,15 @@
     <script src="../assets/js/dashboard.js"></script>
     <script>
         // Inline script to init dashboard and handle logout
-        // (Ideally we move shared auth logic to a shared utility, but this works for now)
-        const { Client, Account } = Appwrite;
-        const client = new Client()
+        // Renamed variables to avoid conflict with dashboard.js
+        const { Client: AppwriteClient, Account: AppwriteAccount } = Appwrite;
+        const appwriteClient = new AppwriteClient()
             .setEndpoint('https://cloud.appwrite.io/v1')
             .setProject('68f0d9e300322bff44ec');
-        const account = new Account(client);
+        const appwriteAccount = new AppwriteAccount(appwriteClient);
 
         // Check Auth immediately
-        account.get().then(user => {
+        appwriteAccount.get().then(user => {
             document.getElementById('user-name').innerText = user.name || user.email;
             if (window.initDashboard) window.initDashboard();
         }).catch(err => {
@@ -123,7 +123,7 @@
         // Logout
         document.querySelector('.logout-link a').addEventListener('click', async (e) => {
             e.preventDefault();
-            await account.deleteSession('current');
+            await appwriteAccount.deleteSession('current');
             window.location.href = '../index.html';
         });
     </script>
