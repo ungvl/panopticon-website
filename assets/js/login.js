@@ -27,8 +27,8 @@ if (loginForm) {
             await account.createEmailPasswordSession(email, password);
             console.log("Logged in!");
 
-            // Redirect to dashboard (index.html)
-            window.location.href = '../index.html';
+            // Redirect to dashboard
+            window.location.href = 'dashboard.html';
         } catch (error) {
             console.error("Login failed", error);
             alert("Login failed: " + (error.message || "Invalid credentials"));

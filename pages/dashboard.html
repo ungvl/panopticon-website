@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Panopticon | Dashboard</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../assets/css/styles.css">
+
+    <!-- Appwrite SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@16.1.0"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <p class="greeting">WELCOME BACK, <span id="user-name">USER</span></p>
+            <div class="logout-link"><a href="#">Sign Out</a></div>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Focus Time Card -->
+            <div class="dashboard-card wide-card">
+                <div class="card-header">
+                    <h3>Focus time (today)</h3>
+                    <span class="badge">Today</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="focusChart"></canvas>
+                </div>
+            </div>
+
+            <!-- App Usage Card -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3>App usage (top apps)</h3>
+                    <span class="badge">7d</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="appsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Coffee Tracker -->
+            <div class="dashboard-card small-card">
+                <div class="card-header">
+                    <h3>Coffee tracker</h3>
+                    <span class="badge">Today</span>
+                </div>
+                <div class="stat-value">
+                    <span id="coffee-count">0</span> Cups
+                </div>
+            </div>
+
+            <!-- Presence Card -->
+            <div class="dashboard-card small-card">
+                <div class="card-header">
+                    <h3>Presence</h3>
+                </div>
+                <div class="presence-status">
+                    Status: <span id="presence-val" class="status-indicator">Present</span>
+                    <p class="last-seen">Last seen: <span id="last-seen">Just now</span></p>
+                </div>
+                <div class="mini-chart">
+                    <canvas id="presenceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="dashboard-card wide-card">
+                <div class="card-header">
+                    <h3>Recent activity</h3>
+                </div>
+                <table class="activity-table">
+                    <thead>
+                        <tr>
+                            <th>App</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activity-rows">
+                        <!-- Rows injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <footer>
+            &copy; 2026 Panopticon Project
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/dashboard.js"></script>
+    <script>
+        // Inline script to init dashboard and handle logout
+        // (Ideally we move shared auth logic to a shared utility, but this works for now)
+        const { Client, Account } = Appwrite;
+        const client = new Client()
+            .setEndpoint('https://cloud.appwrite.io/v1')
+            .setProject('68f0d9e300322bff44ec');
+        const account = new Account(client);
+
+        // Check Auth immediately
+        account.get().then(user => {
+            document.getElementById('user-name').innerText = user.name || user.email;
+            if (window.initDashboard) window.initDashboard();
+        }).catch(err => {
+            console.log("Not logged in, redirecting...", err);
+            window.location.href = 'login.html';
+        });
+
+        // Logout
+        document.querySelector('.logout-link a').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await account.deleteSession('current');
+            window.location.href = '../index.html';
+        });
+    </script>
+</body>
+
+</html>

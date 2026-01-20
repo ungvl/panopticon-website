@@ -15,9 +15,9 @@ const checkAuth = async () => {
         const user = await account.get();
         console.log("Authenticated User:", user);
 
-        // Show Auth View
-        if (unauthContent) unauthContent.classList.add('hidden');
-        if (authContent) authContent.classList.remove('hidden');
+        // Show Auth View / Redirect
+        console.log("User logged in, redirecting to dashboard...");
+        window.location.href = 'pages/dashboard.html';
     } catch (error) {
         console.log("Not authenticated", error);
 
