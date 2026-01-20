@@ -15,7 +15,7 @@ const checkAuth = async () => {
         const user = await account.get();
         console.log("Authenticated User:", user);
 
-        // Show Auth View / Redirect
+        // Redirect to Dashboard
         console.log("User logged in, redirecting to dashboard...");
         window.location.href = 'pages/dashboard.html';
     } catch (error) {
