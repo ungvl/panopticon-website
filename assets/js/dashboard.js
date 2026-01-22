@@ -35,66 +35,128 @@ const initDashboard = async () => {
     fetchRecentActivity().catch(e => console.error("Recent Activity Error:", e));
 };
 
-// 1. Focus Time (Mocked for now as likely needs aggregation, but capable of DB fetch)
+// 1. Focus Time (Aggregated from activity_logs)
 const fetchFocusData = async () => {
-    // In a real scenario, you'd aggregate this from activity_logs or a separate 'daily_stats' collection
-    // For now, we will retain the visualization logic but prepared for data
-    const ctx = document.getElementById('focusChart').getContext('2d');
+    try {
+        const response = await databases.listDocuments(
+            DATABASE_ID,
+            COLLECTIONS.ACTIVITY,
+            [
+                Query.orderDesc('$createdAt'),
+                Query.limit(50)
+            ]
+        );
 
-    // Example: Fetching last 5 'focus' entries if they existed
-    // const response = await databases.listDocuments(DATABASE_ID, COLLECTIONS.ACTIVITY, [Query.equal('type', 'focus'), Query.limit(5)]);
+        const ctx = document.getElementById('focusChart').getContext('2d');
 
-    focusChartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['09:00', '11:00', '13:00', '15:00', '17:00'],
-            datasets: [{
-                label: 'Focus Score',
-                data: [10, 45, 30, 80, 65], // Helper: Replace with real data map
-                borderColor: '#f7d000',
-                backgroundColor: 'rgba(247, 208, 0, 0.1)',
-                tension: 0.4,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { beginAtZero: true, grid: { display: true } },
-                x: { grid: { display: false } }
+        let labels = ['09:00', '11:00', '13:00', '15:00', '17:00'];
+        let data = [10, 45, 30, 80, 65];
+
+        if (response.documents.length > 0) {
+            // Simple aggregation: group by hour and sum duration
+            const hourlyData = {};
+            response.documents.forEach(doc => {
+                const hour = new Date(doc.$createdAt).getHours();
+                const timeLabel = `${hour.toString().padStart(2, '0')}:00`;
+                hourlyData[timeLabel] = (hourlyData[timeLabel] || 0) + (doc.duration || 0);
+            });
+
+            const sortedHours = Object.keys(hourlyData).sort();
+            if (sortedHours.length > 0) {
+                labels = sortedHours;
+                data = sortedHours.map(h => hourlyData[h]);
             }
         }
-    });
+
+        if (focusChartInstance) focusChartInstance.destroy();
+
+        focusChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Focus Minutes',
+                    data: data,
+                    borderColor: '#f7d000',
+                    backgroundColor: 'rgba(247, 208, 0, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { display: true } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    } catch (err) {
+        console.error("Focus Data Error:", err);
+    }
 };
 
-// 2. App Usage (Top Apps)
+// 2. App Usage (Top Apps from activity_logs)
 const fetchAppUsage = async () => {
-    // Placeholder: Fetch top 5 apps by usage duration
-    const ctx = document.getElementById('appsChart').getContext('2d');
+    try {
+        const response = await databases.listDocuments(
+            DATABASE_ID,
+            COLLECTIONS.ACTIVITY,
+            [
+                Query.limit(100)
+            ]
+        );
 
-    appsChartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['VS Code', 'Chrome', 'Slack', 'Terminal', 'Figma'],
-            datasets: [{
-                label: 'Usage (min)',
-                data: [90, 75, 48, 30, 25],
-                backgroundColor: '#fff',
-                borderRadius: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { display: false },
-                x: { grid: { display: false } }
+        const ctx = document.getElementById('appsChart').getContext('2d');
+
+        let labels = ['VS Code', 'Chrome', 'Slack', 'Terminal', 'Figma'];
+        let data = [90, 75, 48, 30, 25];
+
+        if (response.documents.length > 0) {
+            const appTotals = {};
+            response.documents.forEach(doc => {
+                const app = doc.app_used || "Unknown";
+                appTotals[app] = (appTotals[app] || 0) + (doc.duration || 0);
+            });
+
+            const sortedApps = Object.entries(appTotals)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            if (sortedApps.length > 0) {
+                labels = sortedApps.map(a => a[0]);
+                data = sortedApps.map(a => Math.round(a[1]));
             }
         }
-    });
+
+        if (appsChartInstance) appsChartInstance.destroy();
+
+        appsChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Usage (min)',
+                    data: data,
+                    backgroundColor: '#fff',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { display: false },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    } catch (err) {
+        console.error("App Usage Error:", err);
+    }
 };
 
 // 3. Coffee Tracker (Real Count)
@@ -134,15 +196,24 @@ const fetchPresence = async () => {
             const statusEl = document.getElementById('presence-val');
             const lastSeenEl = document.getElementById('last-seen');
 
-            // Assume document has 'status' field
-            statusEl.innerText = latest.status || "Unknown";
-            statusEl.style.color = (latest.status === 'Present') ? '#f7d000' : '#888';
+            // Determine status based on recency (within last 5 minutes)
+            const lastSeenDate = new Date(latest.$createdAt);
+            const now = new Date();
+            const diffMinutes = (now - lastSeenDate) / (1000 * 60);
+            const isPresent = diffMinutes < 5;
 
-            const time = new Date(latest.$createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            statusEl.innerText = isPresent ? "Present" : "Away";
+            statusEl.style.color = isPresent ? '#f7d000' : '#888';
+
+            const time = lastSeenDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             lastSeenEl.innerText = `${time}`;
 
             // Mini Chart Data from last 5 entries
-            const recentStatus = response.documents.slice(0, 5).reverse().map(d => d.status === 'Present' ? 1 : 0);
+            const recentStatus = response.documents.slice(0, 5).reverse().map(d => {
+                const dDate = new Date(d.$createdAt);
+                // Simple logic: if log exists, they were present at that time
+                return 1;
+            });
             renderPresenceMiniChart(recentStatus);
         }
     } catch (err) {
@@ -194,16 +265,16 @@ const fetchRecentActivity = async () => {
         }
 
         tbody.innerHTML = response.documents.map(doc => {
-            // Mapping fields: assumes 'app_name', 'duration', 'status' exist
-            const app = doc.app_name || "Unknown App";
-            const duration = doc.duration ? `${doc.duration}m` : "-";
-            const status = doc.status || "Active";
+            // Mapping fields: assumes 'app_used', 'duration' exist
+            const app = doc.app_used || "Unknown App";
+            const duration = doc.duration ? `${Math.round(doc.duration / 60)}m` : "-";
+            const status = "Active"; // If it's in activity_logs, it was active
 
             return `
                 <tr>
                     <td style="color: #fff; font-weight: 500;">${app}</td>
                     <td>${duration}</td>
-                    <td style="color: ${status === 'Active' ? '#f7d000' : '#888'}">${status}</td>
+                    <td style="color: #f7d000">${status}</td>
                 </tr>
             `;
         }).join('');
