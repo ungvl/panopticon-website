@@ -27,17 +27,12 @@ const initDashboard = async () => {
     Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
     Chart.defaults.font.family = "'Inter', sans-serif";
 
-    try {
-        await Promise.all([
-            fetchFocusData(),
-            fetchAppUsage(),
-            fetchCoffeeCount(),
-            fetchPresence(),
-            fetchRecentActivity()
-        ]);
-    } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-    }
+    // Run fetches individually to prevent one failure blocking others
+    fetchFocusData().catch(e => console.error("Focus Data Error:", e));
+    fetchAppUsage().catch(e => console.error("App Usage Error:", e));
+    fetchCoffeeCount().catch(e => console.error("Coffee Count Error:", e));
+    fetchPresence().catch(e => console.error("Presence Error:", e));
+    fetchRecentActivity().catch(e => console.error("Recent Activity Error:", e));
 };
 
 // 1. Focus Time (Mocked for now as likely needs aggregation, but capable of DB fetch)
