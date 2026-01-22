@@ -345,20 +345,43 @@ if (document.readyState === 'complete') {
 }
 
 
-// Mobile Menu Logic
+// Mobile and Desktop Menu Logic
 document.addEventListener('DOMContentLoaded', () => {
-    const toggleBtn = document.getElementById('menu-toggle');
+    // Mobile Drawer
+    const mobileToggle = document.getElementById('menu-toggle');
+
+    // Desktop Collapse
+    const collapseBtn = document.getElementById('collapse-btn');
     const sidebar = document.getElementById('sidebar');
 
-    if (toggleBtn && sidebar) {
-        toggleBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('active');
-        });
+    if (sidebar) {
+        // Mobile Toggle
+        if (mobileToggle) {
+            mobileToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
+        }
 
-        // Close when clicking outside on mobile
+        // Desktop Collapse
+        if (collapseBtn) {
+            collapseBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+                // Optional: Save preference
+                const isCollapsed = sidebar.classList.contains('collapsed');
+                localStorage.setItem('sidebar-collapsed', isCollapsed);
+            });
+        }
+
+        // Restore preference
+        const savedState = localStorage.getItem('sidebar-collapsed');
+        if (savedState === 'true') {
+            sidebar.classList.add('collapsed');
+        }
+
+        // Close mobile menu when clicking outside
         document.addEventListener('click', (e) => {
             if (window.innerWidth <= 768) {
-                if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target) && sidebar.classList.contains('active')) {
+                if (!sidebar.contains(e.target) && (!mobileToggle || !mobileToggle.contains(e.target)) && sidebar.classList.contains('active')) {
                     sidebar.classList.remove('active');
                 }
             }

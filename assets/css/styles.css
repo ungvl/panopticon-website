@@ -75,7 +75,7 @@ a {
   flex-shrink: 0;
   z-index: 1000;
   color: var(--text-on-yellow);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease, padding 0.3s ease;
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
   /* Strong pop-out shadow */
 }
@@ -89,6 +89,8 @@ a {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .sidebar-logo span {
@@ -114,6 +116,9 @@ a {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid transparent;
   opacity: 0.7;
+  white-space: nowrap;
+  overflow: hidden;
+  gap: 0.75rem;
 }
 
 .nav-item:hover {
@@ -144,6 +149,67 @@ a {
   padding-top: 1.5rem;
 }
 
+/* Collapse Button (Desktop) */
+.collapse-btn {
+  position: absolute;
+  top: 1.5rem;
+  right: -12px;
+  width: 24px;
+  height: 24px;
+  background: #000;
+  color: var(--accent-color);
+  border: 1px solid var(--accent-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1001;
+  transition: all 0.2s ease;
+  opacity: 0;
+  /* Hidden by default, shown on hover/collapsed */
+}
+
+.sidebar:hover .collapse-btn,
+.sidebar.collapsed .collapse-btn {
+  opacity: 1;
+}
+
+.sidebar.collapsed .collapse-btn svg {
+  transform: rotate(180deg);
+}
+
+/* Collapsed Sidebar State */
+.sidebar.collapsed {
+  width: 80px;
+  padding: 2rem 1rem;
+}
+
+.sidebar.collapsed .sidebar-logo span,
+.sidebar.collapsed .nav-item span,
+.sidebar.collapsed .sidebar-logo {
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-logo::after {
+  content: "P.";
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #000;
+  display: block;
+  text-align: center;
+  width: 100%;
+}
+
+.sidebar.collapsed .nav-item {
+  justify-content: center;
+  padding: 1rem;
+}
+
+.sidebar.collapsed .nav-item svg {
+  margin: 0;
+}
+
 /* Mobile Toggle */
 .mobile-menu-toggle {
   display: none;
@@ -172,6 +238,18 @@ a {
   background: var(--bg-color);
   overflow-y: auto;
   height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Center horizontally */
+}
+
+.dashboard-header,
+.dashboard-grid,
+footer {
+  width: 100%;
+  max-width: 1200px;
+  /* Constrain width for centering */
 }
 
 /* Header */
@@ -296,6 +374,10 @@ h2 {
 
   .sidebar.active {
     transform: translateX(290px);
+  }
+
+  .collapse-btn {
+    display: none !important;
   }
 
   .mobile-menu-toggle {
