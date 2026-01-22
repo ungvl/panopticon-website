@@ -67,6 +67,9 @@ const initDashboard = async () => {
 
 // 1. Focus Time (Aggregated from activity_logs)
 const fetchFocusData = async () => {
+    const canvas = document.getElementById('focusChart');
+    if (!canvas) return;
+
     try {
         const response = await databases.listDocuments(
             DATABASE_ID,
@@ -77,7 +80,7 @@ const fetchFocusData = async () => {
             ]
         );
 
-        const ctx = document.getElementById('focusChart').getContext('2d');
+        const ctx = canvas.getContext('2d');
 
         let labels = ['09:00', '11:00', '13:00', '15:00', '17:00'];
         let data = [10, 45, 30, 80, 65];
@@ -130,6 +133,9 @@ const fetchFocusData = async () => {
 
 // 2. App Usage (Top Apps from activity_logs)
 const fetchAppUsage = async () => {
+    const canvas = document.getElementById('appsChart');
+    if (!canvas) return;
+
     try {
         const response = await databases.listDocuments(
             DATABASE_ID,
@@ -139,7 +145,7 @@ const fetchAppUsage = async () => {
             ]
         );
 
-        const ctx = document.getElementById('appsChart').getContext('2d');
+        const ctx = canvas.getContext('2d');
 
         let labels = ['VS Code', 'Chrome', 'Slack', 'Terminal', 'Figma'];
         let data = [90, 75, 48, 30, 25];
@@ -191,6 +197,9 @@ const fetchAppUsage = async () => {
 
 // 3. Coffee Tracker (Real Count)
 const fetchCoffeeCount = async () => {
+    const countEl = document.getElementById('coffee-count');
+    if (!countEl) return;
+
     try {
         console.log("Fetching Coffee logs...");
         const response = await databases.listDocuments(
@@ -202,12 +211,18 @@ const fetchCoffeeCount = async () => {
         document.getElementById('coffee-count').innerText = response.total;
     } catch (err) {
         console.error("Coffee Fetch Error:", err);
-        document.getElementById('coffee-count').innerText = "error";
+        const el = document.getElementById('coffee-count');
+        if (el) el.innerText = "error";
     }
 };
 
 // 4. Presence (Real Status)
 const fetchPresence = async () => {
+    const statusEl = document.getElementById('presence-val');
+    const chartEl = document.getElementById('presenceChart');
+
+    if (!statusEl && !chartEl) return;
+
     try {
         console.log("Fetching Presence logs...");
         const response = await databases.listDocuments(
@@ -252,7 +267,10 @@ const fetchPresence = async () => {
 };
 
 const renderPresenceMiniChart = (data) => {
-    const ctx = document.getElementById('presenceChart').getContext('2d');
+    const canvas = document.getElementById('presenceChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
     presenceChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
@@ -276,6 +294,9 @@ const renderPresenceMiniChart = (data) => {
 
 // 5. Recent Activity Table
 const fetchRecentActivity = async () => {
+    const tbody = document.getElementById('activity-rows');
+    if (!tbody) return;
+
     try {
         console.log("Fetching Activity logs...");
         const response = await databases.listDocuments(
@@ -322,3 +343,25 @@ window.initDashboard = initDashboard;
 if (document.readyState === 'complete') {
     // If loaded as standalone script or helper
 }
+
+
+// Mobile Menu Logic
+document.addEventListener('DOMContentLoaded', () => {
+    const toggleBtn = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+
+    if (toggleBtn && sidebar) {
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        // Close when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target) && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+    }
+});

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Panopticon | Dashboard</title>
+    <title>Panopticon | Presence</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,8 +30,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-logo">PANOPTICON<span>.</span></div>
             <nav class="sidebar-nav">
-                <a href="dashboard.html" class="nav-item active">
-                    <!-- Icon placeholder -->
+                <a href="dashboard.html" class="nav-item">
                     <span>Overview</span>
                 </a>
                 <a href="focus.html" class="nav-item">
@@ -43,7 +42,7 @@
                 <a href="coffee.html" class="nav-item">
                     <span>Coffee Tracker</span>
                 </a>
-                <a href="presence.html" class="nav-item">
+                <a href="presence.html" class="nav-item active">
                     <span>Presence</span>
                 </a>
             </nav>
@@ -53,80 +52,34 @@
         </aside>
 
         <main class="main-scroll-area">
-            <!-- Dashboard Header -->
             <div class="dashboard-header">
-                <p class="greeting">WELCOME BACK, <span id="user-name">USER</span></p>
-                <!-- Logout is now in sidebar, but keeping header clean -->
+                <h2 style="margin:0; font-weight:300;">PRESENCE STATUS</h2>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <p class="greeting" style="margin:0;">USER: <span id="user-name">...</span></p>
+                </div>
             </div>
 
             <div class="dashboard-grid">
-                <!-- Focus Time Card -->
-                <div class="dashboard-card wide-card" onclick="window.location.href='focus.html'"
-                    style="cursor: pointer;">
-                    <div class="card-header">
-                        <h3>Focus time (today)</h3>
-                        <span class="badge">Today</span>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="focusChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- App Usage Card -->
-                <div class="dashboard-card" onclick="window.location.href='apps.html'" style="cursor: pointer;">
-                    <div class="card-header">
-                        <h3>App usage (top apps)</h3>
-                        <span class="badge">7d</span>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="appsChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Coffee Tracker -->
-                <div class="dashboard-card small-card" onclick="window.location.href='coffee.html'"
-                    style="cursor: pointer;">
-                    <div class="card-header">
-                        <h3>Coffee tracker</h3>
-                        <span class="badge">Today</span>
-                    </div>
-                    <div class="stat-value">
-                        <span id="coffee-count">0</span> <span class="stat-unit">Cups</span>
-                    </div>
-                </div>
-
                 <!-- Presence Card -->
-                <div class="dashboard-card small-card" onclick="window.location.href='presence.html'"
-                    style="cursor: pointer;">
-                    <div class="card-header">
-                        <h3>Presence</h3>
-                    </div>
-                    <div class="presence-status">
-                        Status: <span id="presence-val" class="status-indicator">Present</span>
-                        <p class="last-seen">Last seen: <span id="last-seen">Just now</span></p>
-                    </div>
-                    <div class="mini-chart">
-                        <canvas id="presenceChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Recent Activity -->
                 <div class="dashboard-card wide-card">
                     <div class="card-header">
-                        <h3>Recent activity</h3>
+                        <h3>Current Status</h3>
                     </div>
-                    <table class="activity-table">
-                        <thead>
-                            <tr>
-                                <th>App</th>
-                                <th>Time</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="activity-rows">
-                            <!-- Rows injected by JS -->
-                        </tbody>
-                    </table>
+                    <div class="presence-status" style="font-size: 2rem; margin-top: 1rem;">
+                        <span id="presence-val" class="status-indicator">Checking...</span>
+                        <p class="last-seen" style="font-size: 1rem; margin-top: 0.5rem;">Last seen: <span
+                                id="last-seen">...</span></p>
+                    </div>
+                </div>
+
+                <!-- Mini Chart (Expanded) -->
+                <div class="dashboard-card wide-card">
+                    <div class="card-header">
+                        <h3>Recent History (Last 5 Entries)</h3>
+                    </div>
+                    <div class="mini-chart" style="height: 200px;">
+                        <canvas id="presenceChart"></canvas>
+                    </div>
                 </div>
             </div>
 
@@ -139,15 +92,12 @@
     <!-- Scripts -->
     <script src="../assets/js/dashboard.js"></script>
     <script>
-        // Inline script to init dashboard and handle logout
-        // Renamed variables to avoid conflict with dashboard.js
         const { Client: AppwriteClient, Account: AppwriteAccount } = Appwrite;
         const appwriteClient = new AppwriteClient()
             .setEndpoint('https://cloud.appwrite.io/v1')
             .setProject('68f0d9e300322bff44ec');
         const appwriteAccount = new AppwriteAccount(appwriteClient);
 
-        // Check Auth immediately
         appwriteAccount.get().then(user => {
             document.getElementById('user-name').innerText = user.name || user.email;
             if (window.initDashboard) window.initDashboard();
@@ -156,8 +106,6 @@
             window.location.href = 'login.html';
         });
 
-        // Logout
-        // Logout
         const logoutBtn = document.getElementById('sidebar-logout');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', async (e) => {
