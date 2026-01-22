@@ -2,6 +2,8 @@ const { Client, Databases, Query } = Appwrite;
 
 const PROJECT_ID = '68f0d9e300322bff44ec';
 const DATABASE_ID = '68f15a2e00316a2ecc8d';
+const ENDPOINT = 'https://cloud.appwrite.io/v1'; // Reverting to global endpoint
+
 const COLLECTIONS = {
     ACTIVITY: 'activity_logs',
     COFFEE: 'coffee_logs',
@@ -9,10 +11,18 @@ const COLLECTIONS = {
 };
 
 const client = new Client()
-    .setEndpoint('https://cloud.appwrite.io/v1')
+    .setEndpoint(ENDPOINT)
     .setProject(PROJECT_ID);
 
 const databases = new Databases(client);
+
+// Debugging: Log configuration
+console.log("Appwrite Config:", {
+    endpoint: 'https://cloud.appwrite.io/v1',
+    project: PROJECT_ID,
+    database: DATABASE_ID,
+    collections: COLLECTIONS
+});
 
 // Chart Instances
 let focusChartInstance = null;
@@ -20,14 +30,34 @@ let appsChartInstance = null;
 let presenceChartInstance = null;
 
 const initDashboard = async () => {
-    console.log("Initializing Dashboard with Real Data...");
+    console.log("Initializing Dashboard...");
+
+    // Check connection/auth status visually
+    const userNameEl = document.getElementById('user-name');
+    if (userNameEl) {
+        userNameEl.innerHTML += ' <span id="conn-status" style="font-size: 0.6em; color: #888;">(Connecting...)</span>';
+    }
 
     // Config for Chart.js (Dark Mode)
     Chart.defaults.color = '#888';
     Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
     Chart.defaults.font.family = "'Inter', sans-serif";
 
-    // Run fetches individually to prevent one failure blocking others
+    // Test connection
+    try {
+        await databases.listDocuments(DATABASE_ID, COLLECTIONS.ACTIVITY, [Query.limit(1)]);
+        const status = document.getElementById('conn-status');
+        if (status) { status.innerText = '(Connected)'; status.style.color = '#00ff00'; }
+    } catch (e) {
+        console.error("Connection Check Failed:", e);
+        const status = document.getElementById('conn-status');
+        if (status) {
+            status.innerText = '(Connection Error - Check Console)';
+            status.style.color = '#ff4444';
+        }
+    }
+
+    // Run fetches
     fetchFocusData().catch(e => console.error("Focus Data Error:", e));
     fetchAppUsage().catch(e => console.error("App Usage Error:", e));
     fetchCoffeeCount().catch(e => console.error("Coffee Count Error:", e));
@@ -162,26 +192,24 @@ const fetchAppUsage = async () => {
 // 3. Coffee Tracker (Real Count)
 const fetchCoffeeCount = async () => {
     try {
-        // Fetch all coffee logs for "today"
-        // Simply counting documents for now
+        console.log("Fetching Coffee logs...");
         const response = await databases.listDocuments(
             DATABASE_ID,
             COLLECTIONS.COFFEE,
-            [
-                // Query.equal('date', 'today') // Requires correct date format in DB
-                Query.limit(100)
-            ]
+            [Query.limit(100)]
         );
+        console.log("Coffee Response:", response);
         document.getElementById('coffee-count').innerText = response.total;
     } catch (err) {
-        console.warn("Could not fetch coffee logs:", err);
-        document.getElementById('coffee-count').innerText = "0";
+        console.error("Coffee Fetch Error:", err);
+        document.getElementById('coffee-count').innerText = "error";
     }
 };
 
 // 4. Presence (Real Status)
 const fetchPresence = async () => {
     try {
+        console.log("Fetching Presence logs...");
         const response = await databases.listDocuments(
             DATABASE_ID,
             COLLECTIONS.PRESENCE,
@@ -190,6 +218,7 @@ const fetchPresence = async () => {
                 Query.limit(10)
             ]
         );
+        console.log("Presence Response:", response);
 
         if (response.documents.length > 0) {
             const latest = response.documents[0];
@@ -248,27 +277,30 @@ const renderPresenceMiniChart = (data) => {
 // 5. Recent Activity Table
 const fetchRecentActivity = async () => {
     try {
+        console.log("Fetching Activity logs...");
         const response = await databases.listDocuments(
             DATABASE_ID,
             COLLECTIONS.ACTIVITY,
             [
                 Query.orderDesc('$createdAt'),
-                Query.limit(5)
+                Query.limit(10)
             ]
         );
+        console.log("Activity Response:", response);
 
         const tbody = document.getElementById('activity-rows');
 
-        if (response.documents.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; opacity:0.5;">No recent activity</td></tr>';
+        if (!response.documents || response.documents.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; opacity:0.5;">No entries found in Appwrite. Check permissions?</td></tr>';
             return;
         }
 
         tbody.innerHTML = response.documents.map(doc => {
-            // Mapping fields: assumes 'app_used', 'duration' exist
-            const app = doc.app_used || "Unknown App";
+            // Log raw doc to see field names if they are different
+            // console.log("Activity Doc:", doc);
+            const app = doc.app_used || "Unknown";
             const duration = doc.duration ? `${Math.round(doc.duration / 60)}m` : "-";
-            const status = "Active"; // If it's in activity_logs, it was active
+            const status = "Active";
 
             return `
                 <tr>
@@ -280,7 +312,8 @@ const fetchRecentActivity = async () => {
         }).join('');
 
     } catch (err) {
-        console.warn("Could not fetch activity logs:", err);
+        console.error("Activity Fetch Error:", err);
+        document.getElementById('activity-rows').innerHTML = `<tr><td colspan="3" style="color:red; text-align:center;">Error: ${err.message}</td></tr>`;
     }
 };
 
