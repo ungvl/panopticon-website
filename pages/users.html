@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Panopticon | App Usage</title>
+    <title>Panopticon | User Directory</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,8 +15,123 @@
 
     <!-- Appwrite SDK -->
     <script src="https://cdn.jsdelivr.net/npm/appwrite@16.1.0"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .directory-container {
+            width: 100%;
+            max-width: 1400px;
+            margin-bottom: 2rem;
+        }
+
+        .user-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .user-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-4px);
+        }
+
+        .user-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 700;
+            color: #fff;
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .user-email {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .status-badge {
+            font-size: 0.7rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-online {
+            background: rgba(0, 247, 160, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(0, 247, 160, 0.2);
+        }
+
+        .status-offline {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-stats {
+            display: flex;
+            gap: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.25rem;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .view-btn {
+            background: var(--accent-color);
+            color: #000;
+            text-align: center;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .view-btn:hover {
+            filter: brightness(1.1);
+            transform: scale(1.02);
+        }
+    </style>
 </head>
 
 <body>
@@ -48,7 +163,7 @@
                     </svg>
                     <span>Overview</span>
                 </a>
-                <a href="users.html" class="nav-item" id="nav-users" style="display: none;">
+                <a href="users.html" class="nav-item active" id="nav-users">
                     <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"
                         stroke-linecap="round" stroke-linejoin="round">
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -58,13 +173,14 @@
                     </svg>
                     <span>User Directory</span>
                 </a>
-                <a href="admin.html" class="nav-item" id="nav-admin" style="display: none;">
+                <a href="admin.html" class="nav-item" id="nav-admin">
                     <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"
                         stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                     </svg>
-                    <span>Admin View</span>
+                    <span>Admin Console</span>
                 </a>
+                <hr style="border: none; border-top: 1px solid rgba(0,0,0,0.1); margin: 0.5rem 0; width: 100%;">
                 <a href="focus.html" class="nav-item">
                     <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"
                         stroke-linecap="round" stroke-linejoin="round">
@@ -73,7 +189,7 @@
                     </svg>
                     <span>Focus Time</span>
                 </a>
-                <a href="apps.html" class="nav-item active">
+                <a href="apps.html" class="nav-item">
                     <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"
                         stroke-linecap="round" stroke-linejoin="round">
                         <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
@@ -81,25 +197,6 @@
                         <polyline points="2 12 12 17 22 12"></polyline>
                     </svg>
                     <span>App Usage</span>
-                </a>
-                <a href="coffee.html" class="nav-item">
-                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
-                        <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
-                        <line x1="6" y1="1" x2="6" y2="4"></line>
-                        <line x1="10" y1="1" x2="10" y2="4"></line>
-                        <line x1="14" y1="1" x2="14" y2="4"></line>
-                    </svg>
-                    <span>Coffee Tracker</span>
-                </a>
-                <a href="presence.html" class="nav-item">
-                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                    <span>Presence</span>
                 </a>
             </nav>
             <div class="sidebar-footer">
@@ -117,76 +214,32 @@
 
         <main class="main-scroll-area">
             <div class="dashboard-header">
-                <h2 style="margin:0; font-weight:300;">APP USAGE DETAIL</h2>
+                <div>
+                    <h2 style="margin:0; font-weight:300;">USER DIRECTORY</h2>
+                    <p style="opacity: 0.5; font-size: 0.9rem;">Organization Member Status</p>
+                </div>
                 <div style="display: flex; gap: 1rem; align-items: center;">
-                    <p class="greeting" style="margin:0;">USER: <span id="user-name">...</span></p>
+                    <p class="greeting" style="margin:0;">ADMIN: <span id="user-name">...</span></p>
                 </div>
             </div>
 
-            <div class="dashboard-grid">
-                <!-- App Usage Card -->
-                <div class="dashboard-card wide-card">
-                    <div class="card-header">
-                        <h3>Most Used Applications</h3>
-                        <span class="badge">7d</span>
+            <div class="directory-container">
+                <div class="user-grid" id="user-grid">
+                    <!-- User cards injected by JS -->
+                    <div style="grid-column: 1/-1; text-align: center; padding: 4rem; opacity: 0.5;">
+                        Loading member directory...
                     </div>
-                    <div class="chart-container">
-                        <canvas id="appsChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Recent Activity Table (Detailed) -->
-                <div class="dashboard-card wide-card">
-                    <div class="card-header">
-                        <h3>Activity Log History</h3>
-                    </div>
-                    <table class="activity-table">
-                        <thead>
-                            <tr>
-                                <th>App</th>
-                                <th>Time</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="activity-rows">
-                            <!-- Rows injected by JS -->
-                        </tbody>
-                    </table>
                 </div>
             </div>
 
             <footer>
-                &copy; 2026 Panopticon Project
+                &copy; 2026 Panopticon Project | Administrative Access
             </footer>
         </main>
     </div>
 
     <!-- Scripts -->
-    <script src="../assets/js/dashboard.js"></script>
-    <script>
-        const { Client: AppwriteClient, Account: AppwriteAccount } = Appwrite;
-        const appwriteClient = new AppwriteClient()
-            .setEndpoint('https://cloud.appwrite.io/v1')
-            .setProject('68f0d9e300322bff44ec');
-        const appwriteAccount = new AppwriteAccount(appwriteClient);
-
-        appwriteAccount.get().then(user => {
-            document.getElementById('user-name').innerText = user.name || user.email;
-            if (window.initDashboard) window.initDashboard();
-        }).catch(err => {
-            console.log("Not logged in, redirecting...", err);
-            window.location.href = 'login.html';
-        });
-
-        const logoutBtn = document.getElementById('sidebar-logout');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                await appwriteAccount.deleteSession('current');
-                window.location.href = '../index.html';
-            });
-        }
-    </script>
+    <script src="../assets/js/users.js"></script>
 </body>
 
 </html>

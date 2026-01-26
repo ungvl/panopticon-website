@@ -34,6 +34,14 @@ async function initAdmin() {
 
         document.getElementById('user-name').innerText = user.name || user.email;
 
+        // Handle URL Parameter for User Selection
+        const urlParams = new URLSearchParams(window.location.search);
+        const userParam = urlParams.get('u');
+        if (userParam) {
+            selectedUserId = userParam;
+            console.log("Pre-selecting user from URL:", selectedUserId);
+        }
+
         // Initial Fetch
         await refreshAdminData();
 
@@ -54,9 +62,11 @@ async function refreshAdminData() {
     const presenceResponse = await databases.listDocuments(DATABASE_ID, COLLECTIONS.PRESENCE, [Query.limit(100)]);
 
     // 2. Extract unique users based on common fields (userId preferred, fall back to email if logged)
-    // Note: If Appwrite docs don't have user fields, we might only see the active user's data unless permissions allow seeing others.
     const users = new Set();
-    activityResponse.documents.forEach(doc => { if (doc.userId) users.add(doc.userId); else if (doc.userEmail) users.add(doc.userEmail); });
+    activityResponse.documents.forEach(doc => {
+        const uid = doc.userId || doc.userEmail || "Unknown";
+        users.add(uid);
+    });
 
     activeUsers = Array.from(users);
     renderUserList(activeUsers);

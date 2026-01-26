@@ -38,9 +38,9 @@ const initDashboard = async () => {
         const user = await account.get();
         const isAdmin = user.labels && user.labels.includes('admin');
         const adminNav = document.getElementById('nav-admin');
-        if (adminNav) {
-            adminNav.style.display = isAdmin ? 'flex' : 'none';
-        }
+        const usersNav = document.getElementById('nav-users');
+        if (adminNav) adminNav.style.display = isAdmin ? 'flex' : 'none';
+        if (usersNav) usersNav.style.display = isAdmin ? 'flex' : 'none';
         // Sync sessionStorage for other pages
         sessionStorage.setItem('isAdmin', isAdmin);
     } catch (e) {
