@@ -78,7 +78,7 @@ async function refreshAdminData() {
 
 function renderUserList(users) {
     const listEl = document.getElementById('user-list');
-    const allUsersPill = `<div class="user-pill" onclick="window.location.href='users.html'" style="border-style: dashed; opacity: 0.8;">← User Directory</div>`;
+    const allUsersPill = `<div class="user-pill" onclick="window.location.href='users.html'" style="border-style: dashed; opacity: 0.8; margin-right: 0.5rem;">← User Directory</div>`;
 
     const userPills = users.map(u => `
         <div class="user-pill ${selectedUserId === u ? 'active' : ''}" onclick="selectUser('${u}')">
