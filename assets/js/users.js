@@ -29,7 +29,16 @@ async function initUsers() {
         document.getElementById('user-name').innerText = user.name || user.email;
 
         await fetchAndRenderUsers();
-        setInterval(fetchAndRenderUsers, 60000); // Refresh every minute
+
+        // Setup Realtime Subscription
+        console.log("Setting up Realtime subscription...");
+        client.subscribe([
+            `databases.${DATABASE_ID}.collections.${COLLECTIONS.ACTIVITY}.documents`,
+            `databases.${DATABASE_ID}.collections.${COLLECTIONS.PRESENCE}.documents`
+        ], response => {
+            console.log("Realtime Update Received:", response.events);
+            fetchAndRenderUsers();
+        });
     } catch (err) {
         console.error("Auth Error:", err);
         window.location.href = 'login.html';

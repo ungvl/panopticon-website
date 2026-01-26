@@ -45,8 +45,16 @@ async function initAdmin() {
         // Initial Fetch
         await refreshAdminData();
 
-        // Setup Auto-refresh
-        setInterval(refreshAdminData, 30000); // 30s
+        // Setup Realtime Subscription
+        console.log("Setting up Realtime subscription...");
+        client.subscribe([
+            `databases.${DATABASE_ID}.collections.${COLLECTIONS.ACTIVITY}.documents`,
+            `databases.${DATABASE_ID}.collections.${COLLECTIONS.COFFEE}.documents`,
+            `databases.${DATABASE_ID}.collections.${COLLECTIONS.PRESENCE}.documents`
+        ], response => {
+            console.log("Realtime Update Received:", response.events);
+            refreshAdminData();
+        });
     } catch (err) {
         console.error("Admin Auth Error:", err);
         window.location.href = 'login.html';
