@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Panopticon | App Usage</title>
+    <title>Panopticon | Admin View</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,6 +17,71 @@
     <script src="https://cdn.jsdelivr.net/npm/appwrite@16.1.0"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .admin-user-list {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            width: 100%;
+            max-width: 1400px;
+        }
+
+        .user-pill {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .user-pill:hover {
+            border-color: var(--accent-color);
+            color: #fff;
+        }
+
+        .user-pill.active {
+            background: var(--accent-color);
+            color: #000;
+            border-color: var(--accent-color);
+            font-weight: 700;
+        }
+
+        .admin-header-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 1400px;
+            margin-bottom: 2rem;
+        }
+
+        .admin-stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .admin-stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-stat-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #fff;
+        }
+    </style>
 </head>
 
 <body>
@@ -48,13 +113,14 @@
                     </svg>
                     <span>Overview</span>
                 </a>
-                <a href="admin.html" class="nav-item" id="nav-admin" style="display: none;">
+                <a href="admin.html" class="nav-item active" id="nav-admin">
                     <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"
                         stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                     </svg>
                     <span>Admin View</span>
                 </a>
+                <hr style="border: none; border-top: 1px solid rgba(0,0,0,0.1); margin: 0.5rem 0; width: 100%;">
                 <a href="focus.html" class="nav-item">
                     <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"
                         stroke-linecap="round" stroke-linejoin="round">
@@ -63,7 +129,7 @@
                     </svg>
                     <span>Focus Time</span>
                 </a>
-                <a href="apps.html" class="nav-item active">
+                <a href="apps.html" class="nav-item">
                     <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"
                         stroke-linecap="round" stroke-linejoin="round">
                         <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
@@ -107,35 +173,71 @@
 
         <main class="main-scroll-area">
             <div class="dashboard-header">
-                <h2 style="margin:0; font-weight:300;">APP USAGE DETAIL</h2>
+                <div>
+                    <h2 style="margin:0; font-weight:300;">ADMIN CONSOLE</h2>
+                    <p style="opacity: 0.5; font-size: 0.9rem;">Global Monitoring Dashboard</p>
+                </div>
                 <div style="display: flex; gap: 1rem; align-items: center;">
-                    <p class="greeting" style="margin:0;">USER: <span id="user-name">...</span></p>
+                    <p class="greeting" style="margin:0;">ADMIN: <span id="user-name">...</span></p>
+                </div>
+            </div>
+
+            <div class="admin-user-list" id="user-list">
+                <!-- User pills injected by JS -->
+                <div class="user-pill active">All Users</div>
+            </div>
+
+            <div class="admin-header-stats">
+                <div class="admin-stat-card">
+                    <div class="admin-stat-label">Total Users</div>
+                    <div class="admin-stat-value" id="stat-total-users">0</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-label">Acitive Now</div>
+                    <div class="admin-stat-value" id="stat-active-now">0</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-label">Avg Focus</div>
+                    <div class="admin-stat-value" id="stat-avg-focus">0m</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-label">Coffee 24h</div>
+                    <div class="admin-stat-value" id="stat-coffee-24h">0</div>
                 </div>
             </div>
 
             <div class="dashboard-grid">
-                <!-- App Usage Card -->
-                <div class="dashboard-card wide-card">
+                <!-- Charts -->
+                <div class="dashboard-card medium-card">
                     <div class="card-header">
-                        <h3>Most Used Applications</h3>
-                        <span class="badge">7d</span>
+                        <h3>Global Focus Metrics</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="focusChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="dashboard-card medium-card">
+                    <div class="card-header">
+                        <h3>Cross-User App Usage</h3>
                     </div>
                     <div class="chart-container">
                         <canvas id="appsChart"></canvas>
                     </div>
                 </div>
 
-                <!-- Recent Activity Table (Detailed) -->
+                <!-- Recent Activity Table -->
                 <div class="dashboard-card wide-card">
                     <div class="card-header">
-                        <h3>Activity Log History</h3>
+                        <h3>Most Recent Global Activity</h3>
                     </div>
                     <table class="activity-table">
                         <thead>
                             <tr>
+                                <th>User</th>
                                 <th>App</th>
+                                <th>Duration</th>
                                 <th>Time</th>
-                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody id="activity-rows">
@@ -146,37 +248,13 @@
             </div>
 
             <footer>
-                &copy; 2026 Panopticon Project
+                &copy; 2026 Panopticon Project | Administrative Access
             </footer>
         </main>
     </div>
 
     <!-- Scripts -->
-    <script src="../assets/js/dashboard.js"></script>
-    <script>
-        const { Client: AppwriteClient, Account: AppwriteAccount } = Appwrite;
-        const appwriteClient = new AppwriteClient()
-            .setEndpoint('https://cloud.appwrite.io/v1')
-            .setProject('68f0d9e300322bff44ec');
-        const appwriteAccount = new AppwriteAccount(appwriteClient);
-
-        appwriteAccount.get().then(user => {
-            document.getElementById('user-name').innerText = user.name || user.email;
-            if (window.initDashboard) window.initDashboard();
-        }).catch(err => {
-            console.log("Not logged in, redirecting...", err);
-            window.location.href = 'login.html';
-        });
-
-        const logoutBtn = document.getElementById('sidebar-logout');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                await appwriteAccount.deleteSession('current');
-                window.location.href = '../index.html';
-            });
-        }
-    </script>
+    <script src="../assets/js/admin.js"></script>
 </body>
 
 </html>

@@ -1,4 +1,4 @@
-const { Client, Databases, Query } = Appwrite;
+const { Client, Databases, Query, Account } = Appwrite;
 
 const PROJECT_ID = '68f0d9e300322bff44ec';
 const DATABASE_ID = '68f15a2e00316a2ecc8d';
@@ -15,6 +15,7 @@ const client = new Client()
     .setProject(PROJECT_ID);
 
 const databases = new Databases(client);
+const account = new Account(client);
 
 // Debugging: Log configuration
 console.log("Appwrite Config:", {
@@ -32,10 +33,18 @@ let presenceChartInstance = null;
 const initDashboard = async () => {
     console.log("Initializing Dashboard...");
 
-    // Check connection/auth status visually
-    const userNameEl = document.getElementById('user-name');
-    if (userNameEl) {
-        userNameEl.innerHTML += ' <span id="conn-status" style="font-size: 0.6em; color: #888;">(Connecting...)</span>';
+    // Check for admin label
+    try {
+        const user = await account.get();
+        const isAdmin = user.labels && user.labels.includes('admin');
+        const adminNav = document.getElementById('nav-admin');
+        if (adminNav) {
+            adminNav.style.display = isAdmin ? 'flex' : 'none';
+        }
+        // Sync sessionStorage for other pages
+        sessionStorage.setItem('isAdmin', isAdmin);
+    } catch (e) {
+        console.warn("Permission check failed:", e);
     }
 
     // Config for Chart.js (Dark Mode)

@@ -15,6 +15,11 @@ const checkAuth = async () => {
         const user = await account.get();
         console.log("Authenticated User:", user);
 
+        // Check for admin label
+        const isAdmin = user.labels && user.labels.includes('admin');
+        sessionStorage.setItem('isAdmin', isAdmin);
+        sessionStorage.setItem('userEmail', user.email);
+
         // Redirect to Dashboard
         console.log("User logged in, redirecting to dashboard...");
         window.location.href = 'pages/dashboard.html';
