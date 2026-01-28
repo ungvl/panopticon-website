@@ -1,3 +1,5 @@
+console.log("Admin Console v2.1 - Robust Mapping Active");
+
 const { Client, Databases, Query, Account } = Appwrite;
 
 const PROJECT_ID = '68f0d9e300322bff44ec';
@@ -7,7 +9,8 @@ const ENDPOINT = 'https://cloud.appwrite.io/v1';
 const COLLECTIONS = {
     ACTIVITY: 'activity_logs',
     COFFEE: 'coffee_logs',
-    PRESENCE: 'presence_logs'
+    PRESENCE: 'presence_logs',
+    USERS: 'users'
 };
 
 const client = new Client()
@@ -19,6 +22,7 @@ const account = new Account(client);
 
 let selectedUserId = null; // null means "All Users"
 let activeUsers = [];
+let userNamesMap = {}; // Maps ID to Name
 let charts = { focus: null, apps: null };
 
 async function initAdmin() {
@@ -50,7 +54,8 @@ async function initAdmin() {
         client.subscribe([
             `databases.${DATABASE_ID}.collections.${COLLECTIONS.ACTIVITY}.documents`,
             `databases.${DATABASE_ID}.collections.${COLLECTIONS.COFFEE}.documents`,
-            `databases.${DATABASE_ID}.collections.${COLLECTIONS.PRESENCE}.documents`
+            `databases.${DATABASE_ID}.collections.${COLLECTIONS.PRESENCE}.documents`,
+            `databases.${DATABASE_ID}.collections.${COLLECTIONS.USERS}.documents`
         ], response => {
             console.log("Realtime Update Received:", response.events);
             refreshAdminData();
@@ -65,15 +70,31 @@ async function refreshAdminData() {
     console.log("Refreshing Admin Data...");
 
     // 1. Fetch all data to determine users and global stats
+    const usersResponse = await databases.listDocuments(DATABASE_ID, COLLECTIONS.USERS, [Query.limit(100)]);
     const activityResponse = await databases.listDocuments(DATABASE_ID, COLLECTIONS.ACTIVITY, [Query.limit(100), Query.orderDesc('$createdAt')]);
     const coffeeResponse = await databases.listDocuments(DATABASE_ID, COLLECTIONS.COFFEE, [Query.limit(100)]);
     const presenceResponse = await databases.listDocuments(DATABASE_ID, COLLECTIONS.PRESENCE, [Query.limit(100)]);
 
-    // 2. Extract unique users based on common fields (userId preferred, fall back to email if logged)
+    // Update Name Map
+    usersResponse.documents.forEach(doc => {
+        userNamesMap[doc.$id] = doc.name;
+    });
+
+    // 2. Extract unique users
     const users = new Set();
+    // Add all registered users first
+    usersResponse.documents.forEach(doc => {
+        users.add(doc.$id);
+        if (doc.name) userNamesMap[doc.$id] = doc.name;
+    });
+
+    // Add any legacy users found in logs
     activityResponse.documents.forEach(doc => {
-        const uid = doc.userId || doc.userEmail || "Unknown";
+        const uid = doc.userId || doc.userEmail || (doc.users && doc.users.$id) || "Unknown";
+        const name = doc.name || (doc.users && doc.users.name);
+
         users.add(uid);
+        if (name && !userNamesMap[uid]) userNamesMap[uid] = name;
     });
 
     activeUsers = Array.from(users);
@@ -88,11 +109,14 @@ function renderUserList(users) {
     const listEl = document.getElementById('user-list');
     const allUsersPill = `<div class="user-pill" onclick="window.location.href='users.html'" style="border-style: dashed; opacity: 0.8; margin-right: 0.5rem;">← User Directory</div>`;
 
-    const userPills = users.map(u => `
-        <div class="user-pill ${selectedUserId === u ? 'active' : ''}" onclick="selectUser('${u}')">
-            ${u.length > 20 ? u.substring(0, 15) + '...' : u}
-        </div>
-    `).join('');
+    const userPills = users.map(u => {
+        const displayName = userNamesMap[u] || (u.includes('@') ? u.split('@')[0] : u);
+        return `
+            <div class="user-pill ${selectedUserId === u ? 'active' : ''}" onclick="selectUser('${u}')">
+                ${displayName.length > 20 ? displayName.substring(0, 15) + '...' : displayName}
+            </div>
+        `;
+    }).join('');
 
     listEl.innerHTML = allUsersPill + userPills;
 }

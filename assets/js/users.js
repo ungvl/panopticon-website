@@ -1,3 +1,5 @@
+console.log("User Directory v2.1 - Robust Mapping Active");
+
 const { Client, Databases, Query, Account } = Appwrite;
 
 const PROJECT_ID = '68f0d9e300322bff44ec';
@@ -6,7 +8,8 @@ const ENDPOINT = 'https://cloud.appwrite.io/v1';
 
 const COLLECTIONS = {
     ACTIVITY: 'activity_logs',
-    PRESENCE: 'presence_logs'
+    PRESENCE: 'presence_logs',
+    USERS: 'users'
 };
 
 const client = new Client()
@@ -34,7 +37,8 @@ async function initUsers() {
         console.log("Setting up Realtime subscription...");
         client.subscribe([
             `databases.${DATABASE_ID}.collections.${COLLECTIONS.ACTIVITY}.documents`,
-            `databases.${DATABASE_ID}.collections.${COLLECTIONS.PRESENCE}.documents`
+            `databases.${DATABASE_ID}.collections.${COLLECTIONS.PRESENCE}.documents`,
+            `databases.${DATABASE_ID}.collections.${COLLECTIONS.USERS}.documents`
         ], response => {
             console.log("Realtime Update Received:", response.events);
             fetchAndRenderUsers();
@@ -51,27 +55,48 @@ async function fetchAndRenderUsers() {
 
     try {
         // 1. Fetch data for aggregation
+        const usersResponse = await databases.listDocuments(DATABASE_ID, COLLECTIONS.USERS, [Query.limit(100)]);
         const activityResponse = await databases.listDocuments(DATABASE_ID, COLLECTIONS.ACTIVITY, [Query.limit(100)]);
         const presenceResponse = await databases.listDocuments(DATABASE_ID, COLLECTIONS.PRESENCE, [Query.limit(100), Query.orderDesc('$createdAt')]);
 
         // 2. Aggregate Data per User
         const userMap = {};
 
+        // Initialize from Users Collection
+        console.log(`Found ${usersResponse.documents.length} users in metadata collection.`);
+        usersResponse.documents.forEach(doc => {
+            const uid = doc.$id;
+            userMap[uid] = {
+                id: uid,
+                name: doc.name || "Unknown Member",
+                email: doc.email || "",
+                totalFocus: 0,
+                lastSeen: null,
+                isOnline: false
+            };
+        });
+
         // Process Activity
+        console.log(`Processing ${activityResponse.documents.length} activity logs.`);
         activityResponse.documents.forEach(doc => {
-            const uid = doc.userId || doc.userEmail || "Unknown";
+            const uid = doc.userId || doc.userEmail || (doc.users && doc.users.$id) || "Unknown";
+            const name = doc.name || (doc.users && doc.users.name) || (uid.includes('@') ? uid.split('@')[0] : uid);
+
             if (!userMap[uid]) {
-                userMap[uid] = { id: uid, totalFocus: 0, lastSeen: null, isOnline: false };
+                userMap[uid] = { id: uid, name: name, email: uid, totalFocus: 0, lastSeen: null, isOnline: false };
             }
             userMap[uid].totalFocus += (doc.duration || 0);
         });
 
         // Process Presence
+        console.log(`Processing ${presenceResponse.documents.length} presence logs.`);
         const now = new Date();
         presenceResponse.documents.forEach(doc => {
-            const uid = doc.userId || doc.userEmail || "Unknown";
+            const uid = doc.userId || doc.userEmail || (doc.users && doc.users.$id) || "Unknown";
+            const name = doc.name || (doc.users && doc.users.name) || (uid.includes('@') ? uid.split('@')[0] : uid);
+
             if (!userMap[uid]) {
-                userMap[uid] = { id: uid, totalFocus: 0, lastSeen: null, isOnline: false };
+                userMap[uid] = { id: uid, name: name, email: uid, totalFocus: 0, lastSeen: null, isOnline: false };
             }
 
             const docDate = new Date(doc.$createdAt);
@@ -86,7 +111,7 @@ async function fetchAndRenderUsers() {
         // 3. Render
         const userList = Object.values(userMap);
         if (userList.length === 0) {
-            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 4rem; opacity: 0.5;">No users found with activity.</div>';
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 4rem; opacity: 0.5;">No users found.</div>';
             return;
         }
 
@@ -94,8 +119,8 @@ async function fetchAndRenderUsers() {
             <div class="user-card">
                 <div class="user-card-header">
                     <div class="user-info">
-                        <span class="user-name">${user.id.split('@')[0].toUpperCase()}</span>
-                        <span class="user-email">${user.id.includes('@') ? user.id : 'Internal ID: ' + user.id}</span>
+                        <span class="user-name">${user.name.toUpperCase()}</span>
+                        <span class="user-email">${user.email || user.id}</span>
                     </div>
                     <span class="status-badge ${user.isOnline ? 'status-online' : 'status-offline'}">
                         ${user.isOnline ? 'Online' : 'Offline'}
