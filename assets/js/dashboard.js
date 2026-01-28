@@ -17,6 +17,11 @@ const initDashboard = async () => {
     // Check for admin label & Handle Dynamic Module Loading
     try {
         const user = await account.get();
+
+        // Update UI with User Name
+        const userNameEl = document.getElementById('user-name');
+        if (userNameEl) userNameEl.innerText = user.name || user.email;
+
         const isAdmin = user.labels && user.labels.includes('admin');
         const adminNav = document.getElementById('nav-admin');
         const usersNav = document.getElementById('nav-users');
@@ -50,7 +55,7 @@ const initDashboard = async () => {
     } catch (e) {
         // Not logged in or permission issue
         if (!window.location.pathname.includes('login.html') && !window.location.pathname.includes('index.html')) {
-            // window.location.href = '../index.html';
+            window.location.href = 'login.html';
         }
     }
 
@@ -206,18 +211,15 @@ const fetchCoffeeCount = async () => {
     if (!countEl) return;
 
     try {
-        console.log("Fetching Coffee logs...");
         const response = await databases.listDocuments(
             DATABASE_ID,
             COLLECTIONS.COFFEE,
             [Query.limit(100)]
         );
-        console.log("Coffee Response:", response);
         document.getElementById('coffee-count').innerText = response.total;
     } catch (err) {
-        console.error("Coffee Fetch Error:", err);
         const el = document.getElementById('coffee-count');
-        if (el) el.innerText = "error";
+        if (el) el.innerText = "0";
     }
 };
 
@@ -229,7 +231,6 @@ const fetchPresence = async () => {
     if (!statusEl && !chartEl) return;
 
     try {
-        console.log("Fetching Presence logs...");
         const response = await databases.listDocuments(
             DATABASE_ID,
             COLLECTIONS.PRESENCE,
@@ -238,7 +239,6 @@ const fetchPresence = async () => {
                 Query.limit(10)
             ]
         );
-        console.log("Presence Response:", response);
 
         if (response.documents.length > 0) {
             const latest = response.documents[0];
@@ -258,15 +258,10 @@ const fetchPresence = async () => {
             lastSeenEl.innerText = `${time}`;
 
             // Mini Chart Data from last 5 entries
-            const recentStatus = response.documents.slice(0, 5).reverse().map(d => {
-                const dDate = new Date(d.$createdAt);
-                // Simple logic: if log exists, they were present at that time
-                return 1;
-            });
+            const recentStatus = response.documents.slice(0, 5).reverse().map(d => 1);
             renderPresenceMiniChart(recentStatus);
         }
     } catch (err) {
-        console.warn("Could not fetch presence:", err);
         renderPresenceMiniChart([0, 0, 0, 0, 0]);
     }
 };
@@ -303,7 +298,6 @@ const fetchRecentActivity = async () => {
     if (!tbody) return;
 
     try {
-        console.log("Fetching Activity logs...");
         const response = await databases.listDocuments(
             DATABASE_ID,
             COLLECTIONS.ACTIVITY,
@@ -312,12 +306,11 @@ const fetchRecentActivity = async () => {
                 Query.limit(10)
             ]
         );
-        console.log("Activity Response:", response);
 
         const tbody = document.getElementById('activity-rows');
 
         if (!response.documents || response.documents.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; opacity:0.5;">No entries found in Appwrite. Check permissions?</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; opacity:0.5;">No entries found.</td></tr>';
             return;
         }
 

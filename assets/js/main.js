@@ -23,8 +23,6 @@ const checkAuth = async () => {
         // Redirect to Dashboard
         window.location.href = 'pages/dashboard.html';
     } catch (error) {
-        console.log("Not authenticated", error);
-
         // Show Guest View
         if (unauthContent) unauthContent.classList.remove('hidden');
         if (authContent) authContent.classList.add('hidden');
@@ -41,7 +39,7 @@ const handleLogout = async (e) => {
         await account.deleteSession('current');
         window.location.reload();
     } catch (error) {
-        console.error("Logout failed", error);
+        // Silent fail
     }
 };
 
