@@ -8,6 +8,13 @@ const client = new Client()
 const databases = new Databases(client);
 const account = new Account(client);
 
+// Expose globals for dynamic modules
+window.client = client;
+window.databases = databases;
+window.account = account;
+window.Query = Query;
+window.Appwrite = Appwrite;
+
 // Chart Instances
 let focusChartInstance = null;
 let appsChartInstance = null;
@@ -42,7 +49,8 @@ const initDashboard = async () => {
             // Load the corresponding script
             const scriptName = path.includes('admin.html') ? 'admin.js' : 'users.js';
             const script = document.createElement('script');
-            script.src = `../assets/js/${scriptName}`;
+            // Cache busting for development
+            script.src = `../assets/js/${scriptName}?v=${new Date().getTime()}`;
             document.body.appendChild(script);
 
             // Initialize the specific page logic after script loads
