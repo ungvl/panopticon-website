@@ -1,8 +1,9 @@
 const { Client, Account } = Appwrite;
 
+// Config is loaded from config.js
 const client = new Client()
-    .setEndpoint('https://cloud.appwrite.io/v1')
-    .setProject('68f0d9e300322bff44ec');
+    .setEndpoint(ENDPOINT)
+    .setProject(PROJECT_ID);
 
 const account = new Account(client);
 
@@ -25,12 +26,10 @@ if (loginForm) {
         try {
             // Create session using email and password
             await account.createEmailPasswordSession(email, password);
-            console.log("Logged in!");
 
             // Redirect to dashboard
             window.location.href = 'dashboard.html';
         } catch (error) {
-            console.error("Login failed", error);
             alert("Login failed: " + (error.message || "Invalid credentials"));
             submitBtn.innerText = originalBtnText;
             submitBtn.disabled = false;

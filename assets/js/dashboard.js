@@ -1,15 +1,6 @@
 const { Client, Databases, Query, Account } = Appwrite;
 
-const PROJECT_ID = '68f0d9e300322bff44ec';
-const DATABASE_ID = '68f15a2e00316a2ecc8d';
-const ENDPOINT = 'https://cloud.appwrite.io/v1'; // Reverting to global endpoint
-
-const COLLECTIONS = {
-    ACTIVITY: 'activity_logs',
-    COFFEE: 'coffee_logs',
-    PRESENCE: 'presence_logs'
-};
-
+// Config is loaded from config.js
 const client = new Client()
     .setEndpoint(ENDPOINT)
     .setProject(PROJECT_ID);
@@ -17,23 +8,13 @@ const client = new Client()
 const databases = new Databases(client);
 const account = new Account(client);
 
-// Debugging: Log configuration
-console.log("Appwrite Config:", {
-    endpoint: 'https://cloud.appwrite.io/v1',
-    project: PROJECT_ID,
-    database: DATABASE_ID,
-    collections: COLLECTIONS
-});
-
 // Chart Instances
 let focusChartInstance = null;
 let appsChartInstance = null;
 let presenceChartInstance = null;
 
 const initDashboard = async () => {
-    console.log("Initializing Dashboard...");
-
-    // Check for admin label
+    // Check for admin label & Handle Dynamic Module Loading
     try {
         const user = await account.get();
         const isAdmin = user.labels && user.labels.includes('admin');
@@ -41,10 +22,36 @@ const initDashboard = async () => {
         const usersNav = document.getElementById('nav-users');
         if (adminNav) adminNav.style.display = isAdmin ? 'flex' : 'none';
         if (usersNav) usersNav.style.display = isAdmin ? 'flex' : 'none';
+
         // Sync sessionStorage for other pages
         sessionStorage.setItem('isAdmin', isAdmin);
+
+        // Dynamic Loader: If on an admin page, load the logic only if authorized
+        const path = window.location.pathname;
+        if (path.includes('admin.html') || path.includes('users.html')) {
+            if (!isAdmin) {
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            // Load the corresponding script
+            const scriptName = path.includes('admin.html') ? 'admin.js' : 'users.js';
+            const script = document.createElement('script');
+            script.src = `../assets/js/${scriptName}`;
+            document.body.appendChild(script);
+
+            // Initialize the specific page logic after script loads
+            script.onload = () => {
+                if (scriptName === 'admin.js' && window.initAdmin) window.initAdmin();
+                if (scriptName === 'users.js' && window.initUsers) window.initUsers();
+            };
+        }
+
     } catch (e) {
-        console.warn("Permission check failed:", e);
+        // Not logged in or permission issue
+        if (!window.location.pathname.includes('login.html') && !window.location.pathname.includes('index.html')) {
+            // window.location.href = '../index.html';
+        }
     }
 
     // Config for Chart.js (Dark Mode)
@@ -52,26 +59,15 @@ const initDashboard = async () => {
     Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
     Chart.defaults.font.family = "'Inter', sans-serif";
 
-    // Test connection
-    try {
-        await databases.listDocuments(DATABASE_ID, COLLECTIONS.ACTIVITY, [Query.limit(1)]);
-        const status = document.getElementById('conn-status');
-        if (status) { status.innerText = '(Connected)'; status.style.color = '#00ff00'; }
-    } catch (e) {
-        console.error("Connection Check Failed:", e);
-        const status = document.getElementById('conn-status');
-        if (status) {
-            status.innerText = '(Connection Error - Check Console)';
-            status.style.color = '#ff4444';
-        }
-    }
+    // Silently check connection in background
+    databases.listDocuments(DATABASE_ID, COLLECTIONS.ACTIVITY, [Query.limit(1)]).catch(() => { });
 
     // Run fetches
-    fetchFocusData().catch(e => console.error("Focus Data Error:", e));
-    fetchAppUsage().catch(e => console.error("App Usage Error:", e));
-    fetchCoffeeCount().catch(e => console.error("Coffee Count Error:", e));
-    fetchPresence().catch(e => console.error("Presence Error:", e));
-    fetchRecentActivity().catch(e => console.error("Recent Activity Error:", e));
+    if (document.getElementById('focusChart')) fetchFocusData();
+    if (document.getElementById('appsChart')) fetchAppUsage();
+    if (document.getElementById('coffee-count')) fetchCoffeeCount();
+    if (document.getElementById('presence-val')) fetchPresence();
+    if (document.getElementById('activity-rows')) fetchRecentActivity();
 };
 
 // 1. Focus Time (Aggregated from activity_logs)
@@ -354,46 +350,52 @@ if (document.readyState === 'complete') {
 }
 
 
-// Mobile and Desktop Menu Logic
+// Mobile and Desktop Menu Logic + Global Listeners
 document.addEventListener('DOMContentLoaded', () => {
+    initDashboard();
+
     // Mobile Drawer
     const mobileToggle = document.getElementById('menu-toggle');
-
-    // Desktop Collapse
     const collapseBtn = document.getElementById('collapse-btn');
     const sidebar = document.getElementById('sidebar');
 
     if (sidebar) {
-        // Mobile Toggle
         if (mobileToggle) {
             mobileToggle.addEventListener('click', () => {
                 sidebar.classList.toggle('active');
             });
         }
 
-        // Desktop Collapse
         if (collapseBtn) {
             collapseBtn.addEventListener('click', () => {
                 sidebar.classList.toggle('collapsed');
-                // Optional: Save preference
-                const isCollapsed = sidebar.classList.contains('collapsed');
-                localStorage.setItem('sidebar-collapsed', isCollapsed);
+                localStorage.setItem('sidebar-collapsed', sidebar.classList.contains('collapsed'));
             });
         }
 
-        // Restore preference
         const savedState = localStorage.getItem('sidebar-collapsed');
         if (savedState === 'true') {
             sidebar.classList.add('collapsed');
         }
 
-        // Close mobile menu when clicking outside
         document.addEventListener('click', (e) => {
             if (window.innerWidth <= 768) {
                 if (!sidebar.contains(e.target) && (!mobileToggle || !mobileToggle.contains(e.target)) && sidebar.classList.contains('active')) {
                     sidebar.classList.remove('active');
                 }
             }
+        });
+    }
+
+    // Logout
+    const logoutBtn = document.getElementById('sidebar-logout');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                await account.deleteSession('current');
+                window.location.href = '../index.html';
+            } catch (err) { }
         });
     }
 });

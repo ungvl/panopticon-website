@@ -1,23 +1,4 @@
-console.log("User Directory v2.1 - Robust Mapping Active");
-
-const { Client, Databases, Query, Account } = Appwrite;
-
-const PROJECT_ID = '68f0d9e300322bff44ec';
-const DATABASE_ID = '68f15a2e00316a2ecc8d';
-const ENDPOINT = 'https://cloud.appwrite.io/v1';
-
-const COLLECTIONS = {
-    ACTIVITY: 'activity_logs',
-    PRESENCE: 'presence_logs',
-    USERS: 'users'
-};
-
-const client = new Client()
-    .setEndpoint(ENDPOINT)
-    .setProject(PROJECT_ID);
-
-const databases = new Databases(client);
-const account = new Account(client);
+// User Directory - Logic loaded dynamically by dashboard.js
 
 async function initUsers() {
     try {
@@ -34,23 +15,19 @@ async function initUsers() {
         await fetchAndRenderUsers();
 
         // Setup Realtime Subscription
-        console.log("Setting up Realtime subscription...");
         client.subscribe([
             `databases.${DATABASE_ID}.collections.${COLLECTIONS.ACTIVITY}.documents`,
             `databases.${DATABASE_ID}.collections.${COLLECTIONS.PRESENCE}.documents`,
             `databases.${DATABASE_ID}.collections.${COLLECTIONS.USERS}.documents`
         ], response => {
-            console.log("Realtime Update Received:", response.events);
             fetchAndRenderUsers();
         });
     } catch (err) {
-        console.error("Auth Error:", err);
         window.location.href = 'login.html';
     }
 }
 
 async function fetchAndRenderUsers() {
-    console.log("Fetching directory data...");
     const grid = document.getElementById('user-grid');
 
     try {
@@ -63,7 +40,6 @@ async function fetchAndRenderUsers() {
         const userMap = {};
 
         // Initialize from Users Collection
-        console.log(`Found ${usersResponse.documents.length} users in metadata collection.`);
         usersResponse.documents.forEach(doc => {
             const uid = doc.$id;
             userMap[uid] = {
@@ -77,7 +53,6 @@ async function fetchAndRenderUsers() {
         });
 
         // Process Activity
-        console.log(`Processing ${activityResponse.documents.length} activity logs.`);
         activityResponse.documents.forEach(doc => {
             const uid = doc.userId || doc.userEmail || (doc.users && doc.users.$id) || "Unknown";
             const name = doc.name || (doc.users && doc.users.name) || (uid.includes('@') ? uid.split('@')[0] : uid);
@@ -89,7 +64,6 @@ async function fetchAndRenderUsers() {
         });
 
         // Process Presence
-        console.log(`Processing ${presenceResponse.documents.length} presence logs.`);
         const now = new Date();
         presenceResponse.documents.forEach(doc => {
             const uid = doc.userId || doc.userEmail || (doc.users && doc.users.$id) || "Unknown";
@@ -158,24 +132,5 @@ function formatTime(date) {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-// Basic Sidebar functionality
-document.addEventListener('DOMContentLoaded', () => {
-    initUsers();
-
-    const collapseBtn = document.getElementById('collapse-btn');
-    const sidebar = document.getElementById('sidebar');
-    if (sidebar && collapseBtn) {
-        collapseBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-        });
-    }
-
-    const logoutBtn = document.getElementById('sidebar-logout');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            await account.deleteSession('current');
-            window.location.href = '../index.html';
-        });
-    }
-});
+// Global functions
+window.initUsers = initUsers;

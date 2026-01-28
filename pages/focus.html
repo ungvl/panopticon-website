@@ -155,31 +155,8 @@
     </div>
 
     <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
     <script src="../assets/js/dashboard.js"></script>
-    <script>
-        const { Client: AppwriteClient, Account: AppwriteAccount } = Appwrite;
-        const appwriteClient = new AppwriteClient()
-            .setEndpoint('https://cloud.appwrite.io/v1')
-            .setProject('68f0d9e300322bff44ec');
-        const appwriteAccount = new AppwriteAccount(appwriteClient);
-
-        appwriteAccount.get().then(user => {
-            document.getElementById('user-name').innerText = user.name || user.email;
-            if (window.initDashboard) window.initDashboard();
-        }).catch(err => {
-            console.log("Not logged in, redirecting...", err);
-            window.location.href = 'login.html';
-        });
-
-        const logoutBtn = document.getElementById('sidebar-logout');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                await appwriteAccount.deleteSession('current');
-                window.location.href = '../index.html';
-            });
-        }
-    </script>
 </body>
 
 </html>

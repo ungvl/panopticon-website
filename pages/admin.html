@@ -12,76 +12,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="../assets/css/styles.css?v=5">
+    <link rel="stylesheet" href="../assets/css/admin.css?v=1">
 
     <!-- Appwrite SDK -->
     <script src="https://cdn.jsdelivr.net/npm/appwrite@16.1.0"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-        .admin-user-list {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-bottom: 2rem;
-            width: 100%;
-            max-width: 1400px;
-        }
-
-        .user-pill {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 0.75rem 1.5rem;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .user-pill:hover {
-            border-color: var(--accent-color);
-            color: #fff;
-        }
-
-        .user-pill.active {
-            background: var(--accent-color);
-            color: #000;
-            border-color: var(--accent-color);
-            font-weight: 700;
-        }
-
-        .admin-header-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            width: 100%;
-            max-width: 1400px;
-            margin-bottom: 2rem;
-        }
-
-        .admin-stat-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 1.5rem;
-            border-radius: 16px;
-            text-align: center;
-        }
-
-        .admin-stat-label {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.5rem;
-        }
-
-        .admin-stat-value {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: #fff;
-        }
-    </style>
+</head>
 </head>
 
 <body>
@@ -254,8 +191,9 @@
         </main>
     </div>
 
-    <!-- Scripts -->
-    <script src="../assets/js/admin.js"></script>
+    <script src="../assets/js/config.js"></script>
+    <!-- Dynamic Module Loader will handle scripts -->
+    <script src="../assets/js/dashboard.js"></script>
 </body>
 
 </html>

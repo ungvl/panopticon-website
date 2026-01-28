@@ -12,126 +12,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="../assets/css/styles.css?v=5">
+    <link rel="stylesheet" href="../assets/css/admin.css?v=1">
 
     <!-- Appwrite SDK -->
     <script src="https://cdn.jsdelivr.net/npm/appwrite@16.1.0"></script>
-
-    <style>
-        .directory-container {
-            width: 100%;
-            max-width: 1400px;
-            margin-bottom: 2rem;
-        }
-
-        .user-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .user-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 1.75rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .user-card:hover {
-            border-color: var(--accent-color);
-            transform: translateY(-4px);
-        }
-
-        .user-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-
-        .user-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .user-name {
-            font-weight: 700;
-            color: #fff;
-            font-size: 1.1rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .user-email {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .status-badge {
-            font-size: 0.7rem;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .status-online {
-            background: rgba(0, 247, 160, 0.1);
-            color: var(--success-color);
-            border: 1px solid rgba(0, 247, 160, 0.2);
-        }
-
-        .status-offline {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-muted);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .user-stats {
-            display: flex;
-            gap: 1.5rem;
-            border-top: 1px solid var(--border-color);
-            padding-top: 1.25rem;
-        }
-
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .stat-label {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-bottom: 0.25rem;
-        }
-
-        .stat-value {
-            font-weight: 700;
-            color: #fff;
-            font-size: 1rem;
-        }
-
-        .view-btn {
-            background: var(--accent-color);
-            color: #000;
-            text-align: center;
-            padding: 0.75rem;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-        }
-
-        .view-btn:hover {
-            filter: brightness(1.1);
-            transform: scale(1.02);
-        }
-    </style>
+</head>
 </head>
 
 <body>
@@ -238,8 +123,9 @@
         </main>
     </div>
 
-    <!-- Scripts -->
-    <script src="../assets/js/users.js"></script>
+    <script src="../assets/js/config.js"></script>
+    <!-- Dynamic Module Loader will handle scripts -->
+    <script src="../assets/js/dashboard.js"></script>
 </body>
 
 </html>

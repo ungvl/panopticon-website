@@ -1,24 +1,4 @@
-console.log("Admin Console v2.1 - Robust Mapping Active");
-
-const { Client, Databases, Query, Account } = Appwrite;
-
-const PROJECT_ID = '68f0d9e300322bff44ec';
-const DATABASE_ID = '68f15a2e00316a2ecc8d';
-const ENDPOINT = 'https://cloud.appwrite.io/v1';
-
-const COLLECTIONS = {
-    ACTIVITY: 'activity_logs',
-    COFFEE: 'coffee_logs',
-    PRESENCE: 'presence_logs',
-    USERS: 'users'
-};
-
-const client = new Client()
-    .setEndpoint(ENDPOINT)
-    .setProject(PROJECT_ID);
-
-const databases = new Databases(client);
-const account = new Account(client);
+// Admin Console - Logic loaded dynamically by dashboard.js
 
 let selectedUserId = null; // null means "All Users"
 let activeUsers = [];
@@ -31,7 +11,6 @@ async function initAdmin() {
         const isAdmin = user.labels && user.labels.includes('admin');
 
         if (!isAdmin) {
-            console.warn("Unauthorized access attempt to admin view");
             window.location.href = 'dashboard.html';
             return;
         }
@@ -43,31 +22,26 @@ async function initAdmin() {
         const userParam = urlParams.get('u');
         if (userParam) {
             selectedUserId = userParam;
-            console.log("Pre-selecting user from URL:", selectedUserId);
         }
 
         // Initial Fetch
         await refreshAdminData();
 
         // Setup Realtime Subscription
-        console.log("Setting up Realtime subscription...");
         client.subscribe([
             `databases.${DATABASE_ID}.collections.${COLLECTIONS.ACTIVITY}.documents`,
             `databases.${DATABASE_ID}.collections.${COLLECTIONS.COFFEE}.documents`,
             `databases.${DATABASE_ID}.collections.${COLLECTIONS.PRESENCE}.documents`,
             `databases.${DATABASE_ID}.collections.${COLLECTIONS.USERS}.documents`
         ], response => {
-            console.log("Realtime Update Received:", response.events);
             refreshAdminData();
         });
     } catch (err) {
-        console.error("Admin Auth Error:", err);
         window.location.href = 'login.html';
     }
 }
 
 async function refreshAdminData() {
-    console.log("Refreshing Admin Data...");
 
     // 1. Fetch all data to determine users and global stats
     const usersResponse = await databases.listDocuments(DATABASE_ID, COLLECTIONS.USERS, [Query.limit(100)]);
@@ -238,27 +212,6 @@ function renderAppsChart(docs) {
     });
 }
 
-// Sidebar logic
-document.addEventListener('DOMContentLoaded', () => {
-    initAdmin();
-
-    const collapseBtn = document.getElementById('collapse-btn');
-    const sidebar = document.getElementById('sidebar');
-    if (sidebar && collapseBtn) {
-        collapseBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-        });
-    }
-
-    const logoutBtn = document.getElementById('sidebar-logout');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            await account.deleteSession('current');
-            window.location.href = '../index.html';
-        });
-    }
-});
-
-// Polyfill for pixel calculation (internal use for browser tool verification)
+// Global functions
+window.initAdmin = initAdmin;
 window.selectUser = selectUser;

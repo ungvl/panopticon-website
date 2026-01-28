@@ -1,8 +1,9 @@
 const { Client, Account } = Appwrite;
 
+// Config is loaded from config.js
 const client = new Client()
-    .setEndpoint('https://cloud.appwrite.io/v1')
-    .setProject('68f0d9e300322bff44ec');
+    .setEndpoint(ENDPOINT)
+    .setProject(PROJECT_ID);
 
 const account = new Account(client);
 
@@ -13,7 +14,6 @@ const authContent = document.getElementById('auth-content');
 const checkAuth = async () => {
     try {
         const user = await account.get();
-        console.log("Authenticated User:", user);
 
         // Check for admin label
         const isAdmin = user.labels && user.labels.includes('admin');
@@ -21,7 +21,6 @@ const checkAuth = async () => {
         sessionStorage.setItem('userEmail', user.email);
 
         // Redirect to Dashboard
-        console.log("User logged in, redirecting to dashboard...");
         window.location.href = 'pages/dashboard.html';
     } catch (error) {
         console.log("Not authenticated", error);
