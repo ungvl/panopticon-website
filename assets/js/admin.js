@@ -37,7 +37,9 @@ async function initAdmin() {
             refreshAdminData();
         });
     } catch (err) {
-        window.location.href = 'login.html';
+        console.error("Admin Init Error:", err);
+        // Only redirect if it's explicitly an auth error
+        if (err.code === 401) window.location.href = 'login.html';
     }
 }
 

@@ -23,7 +23,8 @@ async function initUsers() {
             fetchAndRenderUsers();
         });
     } catch (err) {
-        window.location.href = 'login.html';
+        console.error("Users Init Error:", err);
+        if (err.code === 401) window.location.href = 'login.html';
     }
 }
 
