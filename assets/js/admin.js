@@ -107,6 +107,12 @@ async function refreshAdminData() {
 // Specialized Updaters
 async function updateFocusParams() {
     const queries = [Query.limit(100), Query.orderDesc('$createdAt')];
+
+    if (selectedUserId) {
+        // Appwrite requires an index on userId for this to work efficently
+        queries.push(Query.equal('userId', selectedUserId));
+    }
+
     const date = getDateFromRange(filters.focus);
     if (date) queries.push(Query.greaterThanEqual('$createdAt', date));
 
@@ -116,6 +122,11 @@ async function updateFocusParams() {
 
 async function updateAppsParams() {
     const queries = [Query.limit(100)];
+
+    if (selectedUserId) {
+        queries.push(Query.equal('userId', selectedUserId));
+    }
+
     const date = getDateFromRange(filters.apps);
     if (date) queries.push(Query.greaterThanEqual('$createdAt', date));
 
@@ -125,6 +136,11 @@ async function updateAppsParams() {
 
 async function updateActivityParams() {
     const queries = [Query.limit(100), Query.orderDesc('$createdAt')];
+
+    if (selectedUserId) {
+        queries.push(Query.equal('userId', selectedUserId));
+    }
+
     const date = getDateFromRange(filters.activity);
     if (date) queries.push(Query.greaterThanEqual('$createdAt', date));
 
@@ -151,7 +167,12 @@ async function updateHeaderStats() {
 
 function renderUserList(users) {
     const listEl = document.getElementById('user-list');
-    const allUsersPill = `<div class="user-pill" onclick="window.location.href='users.html'" style="border-style: dashed; opacity: 0.8; margin-right: 0.5rem;">← User Directory</div>`;
+    // "All Users" Pill
+    const allUsersActive = selectedUserId === null ? 'active' : '';
+    const allUsersPill = `
+        <div class="user-pill ${allUsersActive}" onclick="selectUser(null)" style="border-style: dashed; margin-right: 0.5rem;">
+            All Users
+        </div>`;
 
     const userPills = users.map(u => {
         const displayName = userNamesMap[u] || (u.includes('@') ? u.split('@')[0] : u);
@@ -166,7 +187,13 @@ function renderUserList(users) {
 }
 
 function selectUser(userId) {
-    selectedUserId = userId;
+    selectedUserId = userId; // if null, filters are removed
+
+    // UI Update immediately for responsiveness
+    document.querySelectorAll('.user-pill').forEach(el => el.classList.remove('active'));
+    // Re-render list to update active state correctly
+    renderUserList(activeUsers);
+
     refreshAdminData();
 }
 
