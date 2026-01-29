@@ -209,14 +209,20 @@ function renderActivityTable(docs) {
     tbody.innerHTML = filtered.slice(0, 15).map(doc => {
         const user = doc.userId || doc.userEmail || "Unknown";
         const app = doc.app_used || "-";
-        const duration = doc.duration ? `${Math.round(doc.duration / 60)}m` : "-";
+
+        let durationStr = "-";
+        if (doc.duration) {
+            if (doc.duration < 60) durationStr = `${doc.duration}s`;
+            else durationStr = `${Math.round(doc.duration / 60)}m`;
+        }
+
         const time = new Date(doc.$createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
         return `
             <tr>
                 <td style="color: var(--accent-color);">${user.substring(0, 12)}...</td>
                 <td style="color: #fff;">${app}</td>
-                <td>${duration}</td>
+                <td>${durationStr}</td>
                 <td style="opacity: 0.5;">${time}</td>
             </tr>
         `;
@@ -243,7 +249,8 @@ function renderFocusChart(docs) {
     });
 
     const labels = Object.keys(hourlyData).sort(); // Sort logic might need improvement for mixed dates
-    const data = labels.map(l => hourlyData[l]);
+    // Convert to Minutes
+    const data = labels.map(l => Math.round(hourlyData[l] / 60));
 
     if (charts.focus) charts.focus.destroy();
     charts.focus = new Chart(canvas, {
@@ -281,7 +288,8 @@ function renderAppsChart(docs) {
 
     const sorted = Object.entries(appTotals).sort((a, b) => b[1] - a[1]).slice(0, 5);
     const labels = sorted.map(s => s[0]);
-    const data = sorted.map(s => Math.round(s[1]));
+    // Convert to Minutes
+    const data = sorted.map(s => Math.round(s[1] / 60));
 
     if (charts.apps) charts.apps.destroy();
     charts.apps = new Chart(canvas, {

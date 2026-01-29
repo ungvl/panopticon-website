@@ -115,7 +115,8 @@ const fetchFocusData = async () => {
             const sortedHours = Object.keys(hourlyData).sort();
             if (sortedHours.length > 0) {
                 labels = sortedHours;
-                data = sortedHours.map(h => hourlyData[h]);
+                // Convert Seconds to Minutes for the Chart
+                data = sortedHours.map(h => Math.round(hourlyData[h] / 60));
             }
         }
 
@@ -181,7 +182,8 @@ const fetchAppUsage = async () => {
 
             if (sortedApps.length > 0) {
                 labels = sortedApps.map(a => a[0]);
-                data = sortedApps.map(a => Math.round(a[1]));
+                // Convert Seconds to Minutes for the Chart
+                data = sortedApps.map(a => Math.round(a[1] / 60));
             }
         }
 
@@ -300,40 +302,69 @@ const renderPresenceMiniChart = (data) => {
     });
 };
 
-// 5. Recent Activity Table
+// 5. Daily App Summary (Aggregated)
 const fetchRecentActivity = async () => {
     const tbody = document.getElementById('activity-rows');
     if (!tbody) return;
 
     try {
+        const now = new Date();
+        const startOfDay = new Date(now.setHours(0, 0, 0, 0)).toISOString();
+
+        // Fetch today's activity (limit 100 for now, could paginate if heavy)
         const response = await databases.listDocuments(
             DATABASE_ID,
             COLLECTIONS.ACTIVITY,
             [
-                Query.orderDesc('$createdAt'),
-                Query.limit(10)
+                Query.greaterThanEqual('$createdAt', startOfDay),
+                Query.limit(100)
             ]
         );
 
-        const tbody = document.getElementById('activity-rows');
-
         if (!response.documents || response.documents.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; opacity:0.5;">No entries found.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; opacity:0.5;">No activity recorded today.</td></tr>';
             return;
         }
 
-        tbody.innerHTML = response.documents.map(doc => {
-            // Log raw doc to see field names if they are different
-            // console.log("Activity Doc:", doc);
+        // Aggregate Data
+        const appStats = {};
+
+        response.documents.forEach(doc => {
             const app = doc.app_used || "Unknown";
-            const duration = doc.duration ? `${Math.round(doc.duration / 60)}m` : "-";
-            const status = "Active";
+            const duration = doc.duration || 0;
+            const docTime = new Date(doc.$createdAt);
+
+            if (!appStats[app]) {
+                appStats[app] = { name: app, totalSeconds: 0, lastSeen: docTime };
+            }
+
+            appStats[app].totalSeconds += duration;
+            if (docTime > appStats[app].lastSeen) {
+                appStats[app].lastSeen = docTime;
+            }
+        });
+
+        // Convert to Array and Sort
+        const sortedApps = Object.values(appStats).sort((a, b) => b.totalSeconds - a.totalSeconds);
+
+        tbody.innerHTML = sortedApps.map(stat => {
+            // Smart Duration Formatting
+            let durationStr = "-";
+            if (stat.totalSeconds < 60) {
+                durationStr = `${Math.round(stat.totalSeconds)}s`;
+            } else if (stat.totalSeconds < 3600) {
+                durationStr = `${Math.round(stat.totalSeconds / 60)}m`;
+            } else {
+                durationStr = `${(stat.totalSeconds / 3600).toFixed(1)}h`;
+            }
+
+            const lastActiveTime = stat.lastSeen.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
             return `
                 <tr>
-                    <td style="color: #fff; font-weight: 500;">${app}</td>
-                    <td>${duration}</td>
-                    <td style="color: #f7d000">${status}</td>
+                    <td style="color: #fff; font-weight: 500;">${stat.name}</td>
+                    <td>${durationStr}</td>
+                    <td style="color: #888;">${lastActiveTime}</td>
                 </tr>
             `;
         }).join('');

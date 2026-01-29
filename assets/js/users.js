@@ -109,7 +109,7 @@ async function fetchAndRenderUsers() {
                     </div>
                     <div class="stat-item" style="margin-left: auto;">
                         <span class="stat-label">Total Focus</span>
-                        <span class="stat-value">${Math.round(user.totalFocus / 60)}h ${Math.round(user.totalFocus % 60)}m</span>
+                        <span class="stat-value">${Math.floor(user.totalFocus / 3600)}h ${Math.floor((user.totalFocus % 3600) / 60)}m</span>
                     </div>
                 </div>
 
