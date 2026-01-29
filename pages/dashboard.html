@@ -122,9 +122,22 @@
         <main class="main-scroll-area">
             <!-- Dashboard Header -->
             <div class="dashboard-header">
-                <p class="greeting">WELCOME BACK, <span id="user-name">USER</span></p>
-                <!-- Logout is now in sidebar, but keeping header clean -->
+                <div>
+                    <p class="greeting" style="margin:0;">WELCOME BACK, <span id="user-name">USER</span></p>
+                </div>
+                <div>
+                    <button class="export-btn" id="export-user-report-btn">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2"
+                            fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.5rem;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        My Report
+                    </button>
+                </div>
             </div>
+            <!-- Logout is now in sidebar, but keeping header clean -->
 
             <div class="dashboard-grid">
                 <!-- Focus Time Card -->

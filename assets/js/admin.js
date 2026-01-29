@@ -343,7 +343,7 @@ async function generateReport() {
         </head>
         <body>
             <h1>Panopticon Admin Report</h1>
-            <h2>Organization: Panopticon HQ<br>Date: ${dateStr}</h2>
+            <h2>${selectedUserId ? `User Report: ${userNamesMap[selectedUserId] || selectedUserId}` : 'Organization: Panopticon HQ'}<br>Date: ${dateStr}</h2>
 
             <div class="section-title">Team Overview</div>
             <table style="width: 50%;">
