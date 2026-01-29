@@ -141,6 +141,15 @@
                     <div class="admin-stat-label">Coffee 24h</div>
                     <div class="admin-stat-value" id="stat-coffee-24h">0</div>
                 </div>
+                <button class="export-btn" id="export-report-btn" style="margin-left: auto; align-self: center;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.5rem;">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Export Report
+                </button>
             </div>
 
             <div class="dashboard-grid">
@@ -148,6 +157,11 @@
                 <div class="dashboard-card medium-card">
                     <div class="card-header">
                         <h3>Global Focus Metrics</h3>
+                        <div class="time-filters" data-target="focus">
+                            <span class="filter-option active" data-range="24h">24h</span>
+                            <span class="filter-option" data-range="7d">7d</span>
+                            <span class="filter-option" data-range="30d">30d</span>
+                        </div>
                     </div>
                     <div class="chart-container">
                         <canvas id="focusChart"></canvas>
@@ -157,6 +171,11 @@
                 <div class="dashboard-card medium-card">
                     <div class="card-header">
                         <h3>Cross-User App Usage</h3>
+                        <div class="time-filters" data-target="apps">
+                            <span class="filter-option active" data-range="24h">24h</span>
+                            <span class="filter-option" data-range="7d">7d</span>
+                            <span class="filter-option" data-range="30d">30d</span>
+                        </div>
                     </div>
                     <div class="chart-container">
                         <canvas id="appsChart"></canvas>
@@ -167,6 +186,10 @@
                 <div class="dashboard-card wide-card">
                     <div class="card-header">
                         <h3>Most Recent Global Activity</h3>
+                        <div class="time-filters" data-target="activity">
+                            <span class="filter-option active" data-range="all">All</span>
+                            <span class="filter-option" data-range="24h">24h</span>
+                        </div>
                     </div>
                     <table class="activity-table">
                         <thead>
