@@ -1,0 +1,199 @@
+/* dashboard.css - Cards, Grids, Charts, Tables */
+
+/* Grid Layout */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 1400px;
+}
+
+/* Card Styling */
+.dashboard-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.75rem;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.dashboard-card[onclick]:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+    transform: translateY(-4px);
+}
+
+.dashboard-card[onclick]::after {
+    content: "↗";
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    color: var(--text-muted);
+    opacity: 0;
+    transition: all 0.2s ease;
+    font-size: 1.2rem;
+}
+
+.dashboard-card[onclick]:hover::after {
+    opacity: 1;
+    color: var(--accent-color);
+}
+
+/* Sizing Helpers */
+.wide-card {
+    grid-column: span 12;
+}
+
+.medium-card {
+    grid-column: span 6;
+}
+
+.small-card {
+    grid-column: span 4;
+}
+
+/* Responsive Grid */
+@media (min-width: 1024px) {
+    .wide-card {
+        grid-column: span 8;
+    }
+
+    .dashboard-card:nth-child(2) {
+        grid-column: span 4;
+    }
+
+    .small-card {
+        grid-column: span 4;
+    }
+
+    .dashboard-card:last-child {
+        grid-column: span 12;
+    }
+}
+
+/* Card Header */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.card-header h3 {
+    font-size: 1rem;
+    color: #fff;
+    font-weight: 600;
+    opacity: 1;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.badge {
+    font-size: 0.7rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    color: var(--text-muted);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-weight: 500;
+}
+
+/* Stats */
+.stat-value {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+
+.stat-unit {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 400;
+}
+
+/* Presence Status */
+.presence-status {
+    margin-bottom: 1rem;
+}
+
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+}
+
+.status-indicator::before {
+    content: '';
+    display: block;
+    width: 8px;
+    height: 8px;
+    background: currentColor;
+    border-radius: 50%;
+    box-shadow: 0 0 10px currentColor;
+}
+
+#presence-val.status-present {
+    color: var(--success-color);
+}
+
+#presence-val.status-away {
+    color: var(--accent-color);
+}
+
+#presence-val.status-offline {
+    color: var(--text-muted);
+}
+
+.last-seen {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* Charts */
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 240px;
+    flex: 1;
+}
+
+.mini-chart {
+    height: 100px;
+    width: 100%;
+    margin-top: auto;
+}
+
+/* Tables */
+.activity-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.activity-table th {
+    text-align: left;
+    color: var(--text-muted);
+    font-weight: 500;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.activity-table td {
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    color: #eee;
+}
+
+.activity-table tr:last-child td {
+    border-bottom: none;
+}
