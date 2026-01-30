@@ -197,3 +197,15 @@
 .activity-table tr:last-child td {
     border-bottom: none;
 }
+
+/* Responsive Tables */
+@media (max-width: 768px) {
+    .dashboard-card {
+        overflow-x: auto;
+    }
+
+    .activity-table {
+        min-width: 600px;
+        /* Force scroll */
+    }
+}
