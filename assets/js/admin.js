@@ -206,6 +206,13 @@ function renderActivityTable(docs) {
         return;
     }
 
+    // Also update Efficiency Table (Global) if we have the data
+    if (window.renderEfficiencyTable) {
+        // We use 'docs' (all docs) not filtered by user, unless desired. 
+        // Typically efficiency rankings compare everyone.
+        window.renderEfficiencyTable('efficiency-rows', docs, userNamesMap);
+    }
+
     tbody.innerHTML = filtered.slice(0, 15).map(doc => {
         const user = doc.userId || doc.userEmail || "Unknown";
         const app = doc.app_used || "-";

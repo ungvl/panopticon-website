@@ -80,7 +80,11 @@ const initDashboard = async () => {
     if (document.getElementById('appsChart')) fetchAppUsage();
     if (document.getElementById('coffee-count')) fetchCoffeeCount();
     if (document.getElementById('presence-val')) fetchPresence();
+    if (document.getElementById('presence-val')) fetchPresence();
     if (document.getElementById('activity-rows')) fetchRecentActivity();
+
+    // Init Attention Logic
+    if (window.initAttention) window.initAttention();
 };
 
 // 1. Focus Time (Aggregated from activity_logs)

@@ -9,3 +9,19 @@ const COLLECTIONS = {
     PRESENCE: 'presence_logs',
     USERS: 'users'
 };
+
+const PRODUCTIVE_APPS = [
+    'VS Code',
+    'Visual Studio',
+    'Terminal',
+    'PowerShell',
+    'Command Prompt',
+    'Figma',
+    'Slack',
+    'Discord',
+    'Chrome', // Debatable, but often work
+    'Edge',
+    'Firefox',
+    'Obsidian',
+    'Notion'
+];

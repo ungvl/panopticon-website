@@ -163,6 +163,20 @@
                     </div>
                 </div>
 
+                <!-- Attention Score Card -->
+                <div class="dashboard-card small-card">
+                    <div class="card-header">
+                        <h3>Attention Score</h3>
+                        <span class="badge">Today</span>
+                    </div>
+                    <div class="chart-container" style="position: relative; height: 120px;">
+                        <canvas id="attentionChart"></canvas>
+                        <div id="attention-score-val"
+                            style="position: absolute; bottom: 0; width: 100%; text-align: center; font-size: 1.5rem; font-weight: bold; color: #fff;">
+                            -</div>
+                    </div>
+                </div>
+
                 <!-- Coffee Tracker -->
                 <div class="dashboard-card small-card" onclick="window.location.href='coffee.html'"
                     style="cursor: pointer;">
@@ -218,6 +232,7 @@
 
     <!-- Scripts -->
     <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/attention.js"></script>
     <script src="../assets/js/dashboard.js"></script>
 </body>
 </body>

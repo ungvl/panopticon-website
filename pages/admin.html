@@ -185,6 +185,27 @@
                     </div>
                 </div>
 
+                <!-- Efficiency Rankings -->
+                <div class="dashboard-card wide-card">
+                    <div class="card-header">
+                        <h3>User Efficiency Rankings</h3>
+                        <span class="badge">All Time</span>
+                    </div>
+                    <table class="activity-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">Rank</th>
+                                <th>User</th>
+                                <th>Efficiency Score</th>
+                                <th>Top App</th>
+                            </tr>
+                        </thead>
+                        <tbody id="efficiency-rows">
+                            <!-- Rows injected by attention.js/admin.js -->
+                        </tbody>
+                    </table>
+                </div>
+
                 <!-- Recent Activity Table -->
                 <div class="dashboard-card wide-card">
                     <div class="card-header">
@@ -217,6 +238,7 @@
     </div>
 
     <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/attention.js"></script>
     <!-- Dynamic Module Loader will handle scripts -->
     <script src="../assets/js/dashboard.js"></script>
 </body>
