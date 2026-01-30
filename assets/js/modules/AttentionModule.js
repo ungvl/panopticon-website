@@ -87,3 +87,75 @@ class AttentionModule {
         });
     }
 }
+
+// --- SHARED ADMIN LOGIC ---
+const calculateEfficiencyMetrics = (logs) => {
+    if (!logs || logs.length === 0) return { score: 0, usefulTime: 0, totalTime: 0, topApp: '-' };
+    let usefulTime = 0;
+    let totalTime = 0;
+    const appDurations = {};
+
+    logs.forEach(doc => {
+        const app = doc.app_used || "Unknown";
+        const duration = doc.duration || 0;
+        totalTime += duration;
+        const isProductive = PRODUCTIVE_APPS.some(pApp => app.toLowerCase().includes(pApp.toLowerCase()));
+        if (isProductive) usefulTime += duration;
+        appDurations[app] = (appDurations[app] || 0) + duration;
+    });
+
+    const score = totalTime > 0 ? Math.round((usefulTime / totalTime) * 100) : 0;
+    const topApp = Object.entries(appDurations).sort((a, b) => b[1] - a[1])[0]?.[0] || '-';
+    return { score, usefulTime, totalTime, topApp };
+};
+
+const renderEfficiencyTable = (containerId, allLogs, userMap) => {
+    const tbody = document.getElementById(containerId);
+    if (!tbody) return;
+
+    const userLogs = {};
+    allLogs.forEach(doc => {
+        const uid = doc.userId || doc.userEmail;
+        if (!uid) return;
+        if (!userLogs[uid]) userLogs[uid] = [];
+        userLogs[uid].push(doc);
+    });
+
+    const rankings = Object.keys(userLogs).map(uid => {
+        const metrics = calculateEfficiencyMetrics(userLogs[uid]);
+        return {
+            id: uid,
+            name: userMap[uid] || uid,
+            ...metrics
+        };
+    });
+
+    rankings.sort((a, b) => b.score - a.score);
+
+    tbody.innerHTML = rankings.map((r, index) => {
+        const rank = index + 1;
+        let rankColor = '#fff';
+        if (rank === 1) rankColor = '#f7d000';
+        if (rank === 2) rankColor = '#c0c0c0';
+        if (rank === 3) rankColor = '#cd7f32';
+
+        return `
+            <tr>
+                <td style="color: ${rankColor}; font-weight: bold;">#${rank}</td>
+                <td>${r.name}</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="flex-grow: 1; background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; overflow: hidden;">
+                            <div style="width: ${r.score}%; background: #f7d000; height: 100%;"></div>
+                        </div>
+                        <span style="min-width: 30px; text-align: right;">${r.score}%</span>
+                    </div>
+                </td>
+                <td style="color: #888; font-size: 0.9em;">${r.topApp}</td>
+            </tr>
+        `;
+    }).join('');
+};
+
+// Global Export for Legacy/Admin scripts
+window.renderEfficiencyTable = renderEfficiencyTable;
