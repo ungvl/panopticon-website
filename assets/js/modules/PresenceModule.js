@@ -75,5 +75,7 @@ class PresenceModule {
                 scales: { display: false }
             }
         });
+
     }
 }
+window.PresenceModule = PresenceModule;

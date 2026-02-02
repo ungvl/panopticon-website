@@ -72,5 +72,7 @@ class ActivityModule {
             console.error("Activity Fetch Error:", err);
             tbody.innerHTML = `<tr><td colspan="3" style="color:red; text-align:center;">Error: ${err.message}</td></tr>`;
         }
+
     }
 }
+window.ActivityModule = ActivityModule;

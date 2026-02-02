@@ -68,5 +68,7 @@ class AppsModule {
         } catch (err) {
             console.error("Apps Module Error:", err);
         }
+
     }
 }
+window.AppsModule = AppsModule;

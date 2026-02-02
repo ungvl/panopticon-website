@@ -71,5 +71,7 @@ class FocusModule {
         } catch (err) {
             console.error("Focus Module Error:", err);
         }
+
     }
 }
+window.FocusModule = FocusModule;

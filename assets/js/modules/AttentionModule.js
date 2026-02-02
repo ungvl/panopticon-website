@@ -86,7 +86,9 @@ class AttentionModule {
             }
         });
     }
+
 }
+window.AttentionModule = AttentionModule;
 
 // --- SHARED ADMIN LOGIC ---
 const calculateEfficiencyMetrics = (logs) => {

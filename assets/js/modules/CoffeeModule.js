@@ -22,5 +22,7 @@ class CoffeeModule {
             const el = document.getElementById('coffee-count');
             if (el) el.innerText = "0";
         }
+
     }
 }
+window.CoffeeModule = CoffeeModule;

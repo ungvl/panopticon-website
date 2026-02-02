@@ -85,7 +85,10 @@ class ReportModule {
             </html>
         `;
 
+
         printWindow.document.write(htmlContent);
         printWindow.document.close();
     }
 }
+
+window.ReportModule = ReportModule;
