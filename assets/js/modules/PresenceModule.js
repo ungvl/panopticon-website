@@ -41,15 +41,18 @@ class PresenceModule {
                     lastSeenEl.innerText = `${time}`;
                 }
 
-                const recentStatus = response.documents.slice(0, 5).reverse().map(d => 1);
-                this.renderMiniChart(recentStatus);
+                const recentStatus = response.documents.slice(0, 5).reverse();
+                const chartData = recentStatus.map(d => 1);
+                const chartLabels = recentStatus.map(d => new Date(d.$createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+
+                this.renderMiniChart(chartData, chartLabels);
             }
         } catch (err) {
-            this.renderMiniChart([0, 0, 0, 0, 0]);
+            this.renderMiniChart([0, 0, 0, 0, 0], ['-', '-', '-', '-', '-']);
         }
     }
 
-    renderMiniChart(data) {
+    renderMiniChart(data, labels) {
         const canvas = document.getElementById('presenceChart');
         if (!canvas) return;
 
@@ -59,23 +62,26 @@ class PresenceModule {
         this.chartInstance = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['1', '2', '3', '4', '5'],
+                labels: labels,
                 datasets: [{
                     data: data,
-                    borderColor: '#555',
+                    borderColor: '#f7d000',
                     borderWidth: 2,
-                    pointRadius: 0,
-                    tension: 0.4
+                    pointRadius: 4,
+                    pointBackgroundColor: '#f7d000',
+                    tension: 0.1
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
-                scales: { display: false }
+                scales: {
+                    y: { display: false, min: 0, max: 2 },
+                    x: { ticks: { color: '#666', font: { size: 10 } }, grid: { display: false } }
+                }
             }
         });
-
     }
 }
 window.PresenceModule = PresenceModule;

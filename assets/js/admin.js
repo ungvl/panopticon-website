@@ -198,7 +198,7 @@ function selectUser(userId) {
 }
 
 function renderActivityTable(docs) {
-    const tbody = document.getElementById('activity-rows');
+    const tbody = document.getElementById('admin-activity-rows');
     const filtered = selectedUserId ? docs.filter(d => (d.userId === selectedUserId || d.userEmail === selectedUserId)) : docs;
 
     if (filtered.length === 0) {
@@ -237,7 +237,7 @@ function renderActivityTable(docs) {
 }
 
 function renderFocusChart(docs) {
-    const canvas = document.getElementById('focusChart');
+    const canvas = document.getElementById('admin-focus-chart');
     if (!canvas) return;
 
     const filtered = selectedUserId ? docs.filter(d => (d.userId === selectedUserId || d.userEmail === selectedUserId)) : docs;
@@ -282,7 +282,7 @@ function renderFocusChart(docs) {
 }
 
 function renderAppsChart(docs) {
-    const canvas = document.getElementById('appsChart');
+    const canvas = document.getElementById('admin-apps-chart');
     if (!canvas) return;
 
     const filtered = selectedUserId ? docs.filter(d => (d.userId === selectedUserId || d.userEmail === selectedUserId)) : docs;
@@ -333,8 +333,8 @@ async function generateReport() {
     const printWindow = window.open('', '_blank');
 
     // Convert Chart Canvas to Image
-    const focusImg = document.getElementById('focusChart').toDataURL('image/png');
-    const appsImg = document.getElementById('appsChart').toDataURL('image/png');
+    const focusImg = document.getElementById('admin-focus-chart').toDataURL('image/png');
+    const appsImg = document.getElementById('admin-apps-chart').toDataURL('image/png');
 
     const htmlContent = `
         <!DOCTYPE html>
@@ -390,7 +390,7 @@ async function generateReport() {
                     </tr>
                 </thead>
                 <tbody>
-                    ${document.getElementById('activity-rows').innerHTML}
+                    ${document.getElementById('admin-activity-rows').innerHTML}
                 </tbody>
             </table>
 

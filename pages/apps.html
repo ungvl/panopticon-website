@@ -131,7 +131,11 @@
                 <div class="dashboard-card wide-card">
                     <div class="card-header">
                         <h3>Most Used Applications</h3>
-                        <span class="badge">7d</span>
+                        <div class="time-filters" id="apps-time-filters">
+                            <span class="filter-option active" data-range="24h">24h</span>
+                            <span class="filter-option" data-range="7d">7d</span>
+                            <span class="filter-option" data-range="30d">30d</span>
+                        </div>
                     </div>
                     <div class="chart-container">
                         <canvas id="appsChart"></canvas>
